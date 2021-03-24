@@ -46,8 +46,8 @@ public class StartMainActivityWrapper extends AppCompatActivity
 
         // need this for "dp2px" to work !! -------
         // need this for "dp2px" to work !! -------
-        MainActivity.resources = this.getResources();
-        MainActivity.metrics = MainActivity.resources.getDisplayMetrics();
+        MyMainActivity.resources = this.getResources();
+        MyMainActivity.metrics = MyMainActivity.resources.getDisplayMetrics();
         // need this for "dp2px" to work !! -------
         // need this for "dp2px" to work !! -------
 
@@ -99,7 +99,7 @@ public class StartMainActivityWrapper extends AppCompatActivity
             /* skip the password enter screen
              * jump directly to MainActivity and try to mount/use the Database
              */
-            Intent pattern = new Intent(this, MainActivity.class);
+            Intent pattern = new Intent(this, MyMainActivity.class);
             startActivity(pattern);
 
             Log.i(TAG, "0009");

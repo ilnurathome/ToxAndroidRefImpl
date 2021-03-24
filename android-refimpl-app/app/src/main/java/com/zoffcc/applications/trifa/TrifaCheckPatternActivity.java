@@ -56,7 +56,7 @@ public class TrifaCheckPatternActivity extends ConfirmPatternActivity
         setResult(RESULT_OK);
 
         // ok open main activity
-        Intent main_act = new Intent(this, MainActivity.class);
+        Intent main_act = new Intent(this, MyMainActivity.class);
         startActivity(main_act);
         finish();
     }
@@ -68,7 +68,7 @@ public class TrifaCheckPatternActivity extends ConfirmPatternActivity
         ++mNumFailedAttempts;
 
         // ok open main activity
-        Intent main_act = new Intent(this, MainActivity.class);
+        Intent main_act = new Intent(this, MyMainActivity.class);
         startActivity(main_act);
         finish();
     }
@@ -80,7 +80,7 @@ public class TrifaCheckPatternActivity extends ConfirmPatternActivity
         setResult(RESULT_CANCELED);
 
         // ok open main activity
-        Intent main_act = new Intent(this, MainActivity.class);
+        Intent main_act = new Intent(this, MyMainActivity.class);
         startActivity(main_act);
         finish();
     }
@@ -93,7 +93,7 @@ public class TrifaCheckPatternActivity extends ConfirmPatternActivity
         // super.onForgotPassword();
 
         // ok open main activity
-        Intent main_act = new Intent(this, MainActivity.class);
+        Intent main_act = new Intent(this, MyMainActivity.class);
         startActivity(main_act);
         finish();
     }

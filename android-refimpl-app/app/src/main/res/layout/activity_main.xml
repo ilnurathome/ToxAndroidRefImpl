@@ -80,7 +80,7 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:visibility="visible"
-                tools:context="com.zoffcc.applications.trifa.MainActivity">
+                tools:context="com.zoffcc.applications.trifa.MyMainActivity">
 
                 <RelativeLayout
                     android:layout_width="match_parent"

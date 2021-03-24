@@ -31,6 +31,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Messenger;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -79,6 +81,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
+import static com.zoffcc.applications.trifa.MainService.MSG_PUB;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
@@ -120,6 +123,8 @@ public class HelperGeneric
     static long[] video_frame_age_values = new long[video_frame_age_values_cur_index_count];
     static byte[] buf_video_send_frame = null;
     static long last_log_battery_savings_criteria_ts = -1;
+
+    public static Messenger replyMessenger = null;
 
     public static void clearCache_s()
     {
@@ -365,12 +370,12 @@ public class HelperGeneric
             // e.printStackTrace();
         }
 
-        if (MainActivity.conference_message_list_activity != null)
+        if (MyMainActivity.conference_message_list_activity != null)
         {
             // Log.i(TAG, "conference_message_add_from_sync:noti_and_badge:002conf:" +
             //            conference_message_list_activity.get_current_conf_id() + ":" + conf_id);
 
-            if (MainActivity.conference_message_list_activity.get_current_conf_id().equals(conf_id))
+            if (MyMainActivity.conference_message_list_activity.get_current_conf_id().equals(conf_id))
             {
                 // Log.i(TAG, "noti_and_badge:003:");
                 // no notifcation and no badge update
@@ -404,9 +409,9 @@ public class HelperGeneric
             e.printStackTrace();
         }
 
-        if (MainActivity.conference_message_list_activity != null)
+        if (MyMainActivity.conference_message_list_activity != null)
         {
-            if (MainActivity.conference_message_list_activity.get_current_conf_id().equals(conf_id))
+            if (MyMainActivity.conference_message_list_activity.get_current_conf_id().equals(conf_id))
             {
                 HelperConference.insert_into_conference_message_db(m, true);
             }
@@ -483,11 +488,11 @@ public class HelperGeneric
 
             try
             {
-                if (MainActivity.message_list_activity != null)
+                if (MyMainActivity.message_list_activity != null)
                 {
-                    if (MainActivity.message_list_activity.get_current_friendnum() == friend_number_)
+                    if (MyMainActivity.message_list_activity.get_current_friendnum() == friend_number_)
                     {
-                        MainActivity.message_list_activity.set_friend_connection_status_icon();
+                        MyMainActivity.message_list_activity.set_friend_connection_status_icon();
                     }
                 }
             }
@@ -516,11 +521,11 @@ public class HelperGeneric
 
                 try
                 {
-                    if (MainActivity.message_list_activity != null)
+                    if (MyMainActivity.message_list_activity != null)
                     {
-                        if (MainActivity.message_list_activity.get_current_friendnum() == friend_number_)
+                        if (MyMainActivity.message_list_activity.get_current_friendnum() == friend_number_)
                         {
-                            MainActivity.message_list_activity.set_friend_connection_status_icon();
+                            MyMainActivity.message_list_activity.set_friend_connection_status_icon();
                         }
                     }
                 }
@@ -1243,7 +1248,7 @@ public class HelperGeneric
     {
         try
         {
-            float px = dp * ((float) MainActivity.metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+            float px = dp * ((float) MyMainActivity.metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
             return px;
         }
         catch (Exception e)
@@ -1262,7 +1267,7 @@ public class HelperGeneric
      */
     public static float px2dp(float px)
     {
-        float dp = px / ((float) MainActivity.metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        float dp = px / ((float) MyMainActivity.metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
         return dp;
     }
 
@@ -2048,6 +2053,9 @@ public class HelperGeneric
         // (msg_type == 0) msgV1 text only message -> msg_type, friend_number, friend_message_text_utf8
         // (msg_type == 1) msgV2 direct message    -> msg_type, friend_number, friend_message_text_utf8, raw_message, raw_message_length
         // (msg_type == 2) msgV2 relay message     -> msg_type, friend_number, friend_message_text_utf8, raw_message, raw_message_length, original_sender_pubkey
+
+
+
         if (msg_type == 0)
         {
             // msgV1 text only message
@@ -2057,10 +2065,10 @@ public class HelperGeneric
             boolean do_badge_update = true;
 
             // Log.i(TAG, "noti_and_badge:001:" + message_list_activity);
-            if (MainActivity.message_list_activity != null)
+            if (MyMainActivity.message_list_activity != null)
             {
                 // Log.i(TAG, "noti_and_badge:002:" + message_list_activity.get_current_friendnum() + ":" + friend_number);
-                if (MainActivity.message_list_activity.get_current_friendnum() == friend_number)
+                if (MyMainActivity.message_list_activity.get_current_friendnum() == friend_number)
                 {
                     // Log.i(TAG, "noti_and_badge:003:");
                     // no notifcation and no badge update
@@ -2095,9 +2103,9 @@ public class HelperGeneric
             m.text = friend_message_text_utf8;
             m.msg_version = 0;
 
-            if (MainActivity.message_list_activity != null)
+            if (MyMainActivity.message_list_activity != null)
             {
-                if (MainActivity.message_list_activity.get_current_friendnum() == friend_number)
+                if (MyMainActivity.message_list_activity.get_current_friendnum() == friend_number)
                 {
                     HelperMessage.insert_into_message_db(m, true);
                 }
@@ -2144,10 +2152,10 @@ public class HelperGeneric
             boolean do_badge_update = true;
 
             // Log.i(TAG, "noti_and_badge:001:" + message_list_activity);
-            if (MainActivity.message_list_activity != null)
+            if (MyMainActivity.message_list_activity != null)
             {
                 // Log.i(TAG, "noti_and_badge:002:" + message_list_activity.get_current_friendnum() + ":" + friend_number);
-                if (MainActivity.message_list_activity.get_current_friendnum() == friend_number)
+                if (MyMainActivity.message_list_activity.get_current_friendnum() == friend_number)
                 {
                     // Log.i(TAG, "noti_and_badge:003:");
                     // no notifcation and no badge update
@@ -2210,9 +2218,9 @@ public class HelperGeneric
             m.msg_id_hash = msg_id_as_hex_string;
             Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:" + long_date_time_format(m.rcvd_timestamp));
 
-            if (MainActivity.message_list_activity != null)
+            if (MyMainActivity.message_list_activity != null)
             {
-                if (MainActivity.message_list_activity.get_current_friendnum() == friend_number)
+                if (MyMainActivity.message_list_activity.get_current_friendnum() == friend_number)
                 {
                     HelperMessage.insert_into_message_db(m, true);
                 }
@@ -2262,10 +2270,10 @@ public class HelperGeneric
             boolean do_badge_update = true;
 
             // Log.i(TAG, "noti_and_badge:001:" + message_list_activity);
-            if (MainActivity.message_list_activity != null)
+            if (MyMainActivity.message_list_activity != null)
             {
                 // Log.i(TAG, "noti_and_badge:002:" + message_list_activity.get_current_friendnum() + ":" + friend_number);
-                if (MainActivity.message_list_activity.get_current_friendnum() == friend_number_real_sender)
+                if (MyMainActivity.message_list_activity.get_current_friendnum() == friend_number_real_sender)
                 {
                     // Log.i(TAG, "noti_and_badge:003:");
                     // no notifcation and no badge update
@@ -2329,9 +2337,9 @@ public class HelperGeneric
             Log.i(TAG,
                   "receive_incoming_message:TOX_FILE_KIND_MESSAGEV2_SEND:" + long_date_time_format(m.rcvd_timestamp));
 
-            if (MainActivity.message_list_activity != null)
+            if (MyMainActivity.message_list_activity != null)
             {
-                if (MainActivity.message_list_activity.get_current_friendnum() == friend_number_real_sender)
+                if (MyMainActivity.message_list_activity.get_current_friendnum() == friend_number_real_sender)
                 {
                     HelperMessage.insert_into_message_db(m, true);
                 }
@@ -2369,6 +2377,23 @@ public class HelperGeneric
             {
                 change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey);
             }
+        }
+
+        try {
+            android.os.Message msg = android.os.Message.obtain(null, MSG_PUB, 0, 0);
+
+            Bundle bundle = new Bundle();
+            bundle.putInt("msg_type", msg_type);
+            bundle.putLong("friend_number", friend_number);
+            bundle.putString("tox_friendpubkey", HelperFriend.tox_friend_get_public_key__wrapper(friend_number));
+            bundle.putString("friend_message_text_utf8", friend_message_text_utf8);
+
+            msg.setData(bundle);
+
+            replyMessenger.send(msg);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.i(TAG, "post live data message:" + e.getMessage());
         }
     }
 

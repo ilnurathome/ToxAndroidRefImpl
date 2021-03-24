@@ -143,20 +143,20 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         int my_position = this.getAdapterPosition();
         if (my_position != RecyclerView.NO_POSITION)
         {
-            if (MainActivity.message_list_fragment != null)
+            if (MyMainActivity.message_list_fragment != null)
             {
-                if (MainActivity.message_list_fragment.adapter != null)
+                if (MyMainActivity.message_list_fragment.adapter != null)
                 {
                     if (my_position < 1)
                     {
-                        message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                        message_text_date_string.setText(MyMainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                         message_text_date.setVisibility(View.VISIBLE);
                     }
                     else
                     {
-                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
+                        if (!MyMainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(MyMainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
                         {
-                            message_text_date_string.setText(MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                            message_text_date_string.setText(MyMainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                             message_text_date.setVisibility(View.VISIBLE);
                         }
                     }
@@ -287,7 +287,7 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
                                 Uri file_uri = null;
                                 if (Build.VERSION.SDK_INT > 23)
                                 {
-                                    file_uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", new java.io.File(message.filename_fullpath));
+                                    file_uri = FileProvider.getUriForFile(context, context.getPackageName() + ".provider", new java.io.File(message.filename_fullpath));
                                     newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                 }
                                 else

@@ -236,7 +236,7 @@ public class ConferenceMessageListFragment extends Fragment
         // a = new MessagelistArrayAdapter(context, data_values);
         // setListAdapter(a);
 
-        MainActivity.conference_message_list_fragment = this;
+        MyMainActivity.conference_message_list_fragment = this;
 
         return view;
     }
@@ -268,7 +268,7 @@ public class ConferenceMessageListFragment extends Fragment
         super.onResume();
 
         global_showing_anygroupview = true;
-        MainActivity.conference_message_list_fragment = this;
+        MyMainActivity.conference_message_list_fragment = this;
     }
 
     @Override
@@ -277,7 +277,7 @@ public class ConferenceMessageListFragment extends Fragment
         super.onPause();
 
         global_showing_anygroupview = false;
-        MainActivity.conference_message_list_fragment = null;
+        MyMainActivity.conference_message_list_fragment = null;
     }
 
     synchronized void modify_message(final ConferenceMessage m)

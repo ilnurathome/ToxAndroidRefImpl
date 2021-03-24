@@ -173,7 +173,7 @@ public class HelperFriend
 
                 try
                 {
-                    MainActivity.friend_list_fragment.set_all_friends_to_offline();
+                    MyMainActivity.friend_list_fragment.set_all_friends_to_offline();
                 }
                 catch (Exception e)
                 {
@@ -597,7 +597,7 @@ public class HelperFriend
                 }
             }
 
-            HelperMessage.delete_selected_messages(MainActivity.main_activity_s, false, false, "deleting Messages ...");
+            HelperMessage.delete_selected_messages(MyMainActivity.main_activity_s, false, false, "deleting Messages ...");
         }
         catch (Exception e)
         {
@@ -979,9 +979,9 @@ public class HelperFriend
     {
         try
         {
-            if (MainActivity.friend_list_fragment != null)
+            if (MyMainActivity.friend_list_fragment != null)
             {
-                MainActivity.friend_list_fragment.add_all_friends_clear(delay);
+                MyMainActivity.friend_list_fragment.add_all_friends_clear(delay);
             }
         }
         catch (Exception e)
@@ -994,12 +994,12 @@ public class HelperFriend
     {
         try
         {
-            if (MainActivity.friend_list_fragment != null)
+            if (MyMainActivity.friend_list_fragment != null)
             {
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                 cc.is_friend = true;
                 cc.friend_item = f;
-                MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+                MyMainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
             }
         }
         catch (Exception e)

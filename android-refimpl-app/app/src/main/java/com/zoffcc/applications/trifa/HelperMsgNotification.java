@@ -208,9 +208,9 @@ public class HelperMsgNotification
                             }
 
                             b.setContentTitle(
-                                    context_s.getString(R.string.MainActivity_notification_new_message_title));
+                                    context_s.getString(R.string.MyMainActivity_notification_new_message_title));
                             b.setAutoCancel(true);
-                            b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message2));
+                            b.setContentText(context_s.getString(R.string.MyMainActivity_notification_new_message2));
                             Notification notification3 = b.build();
                             MainActivity.nmn3.notify(Notification_new_message_ID, notification3);
                             // -- notification ------------------

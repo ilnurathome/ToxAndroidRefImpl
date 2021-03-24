@@ -190,7 +190,7 @@ public class HelperMessage
     {
         try
         {
-            if (MainActivity.conference_message_list_fragment != null)
+            if (MyMainActivity.conference_message_list_fragment != null)
             {
                 Thread t = new Thread()
                 {
@@ -211,7 +211,7 @@ public class HelperMessage
                                                     System.currentTimeMillis()))
                                     {
                                         MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
-                                        MainActivity.conference_message_list_fragment.add_message(m);
+                                        MyMainActivity.conference_message_list_fragment.add_message(m);
                                     }
                                 }
                             }
@@ -258,7 +258,7 @@ public class HelperMessage
                                 {
                                     // Log.i(TAG, "add_single_message_from_messge_id:add_message()");
 
-                                    if (MainActivity.message_list_fragment == null)
+                                    if (MyMainActivity.message_list_fragment == null)
                                     {
                                         // ok, we need to wait for onResume to finish
                                         // Log.i(TAG,
@@ -278,7 +278,7 @@ public class HelperMessage
                                                 e.printStackTrace();
                                             }
 
-                                            if (MainActivity.message_list_fragment != null)
+                                            if (MyMainActivity.message_list_fragment != null)
                                             {
                                                 // got it
                                                 break;
@@ -286,10 +286,10 @@ public class HelperMessage
                                         }
                                     }
 
-                                    if (MainActivity.message_list_fragment != null)
+                                    if (MyMainActivity.message_list_fragment != null)
                                     {
                                         MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
-                                        MainActivity.message_list_fragment.add_message(m);
+                                        MyMainActivity.message_list_fragment.add_message(m);
                                     }
                                 }
                             }
@@ -314,7 +314,7 @@ public class HelperMessage
     {
         try
         {
-            if (MainActivity.message_list_fragment != null)
+            if (MyMainActivity.message_list_fragment != null)
             {
                 Thread t = new Thread()
                 {
@@ -334,7 +334,7 @@ public class HelperMessage
                                                     System.currentTimeMillis()))
                                     {
                                         MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
-                                        MainActivity.message_list_fragment.modify_message(m);
+                                        MyMainActivity.message_list_fragment.modify_message(m);
                                     }
                                 }
                             }
@@ -357,7 +357,7 @@ public class HelperMessage
     {
         try
         {
-            if (MainActivity.message_list_fragment != null)
+            if (MyMainActivity.message_list_fragment != null)
             {
                 Thread t = new Thread()
                 {
@@ -376,7 +376,7 @@ public class HelperMessage
                                                 System.currentTimeMillis()))
                                 {
                                     MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
-                                    MainActivity.message_list_fragment.modify_message(m);
+                                    MyMainActivity.message_list_fragment.modify_message(m);
                                 }
                             }
                         }
@@ -400,14 +400,14 @@ public class HelperMessage
     {
         try
         {
-            if (MainActivity.message_list_fragment != null)
+            if (MyMainActivity.message_list_fragment != null)
             {
                 if ((force) ||
                     (MainActivity.update_all_messages_global_timestamp + MainActivity.UPDATE_MESSAGES_NORMAL_MILLIS <
                      System.currentTimeMillis()))
                 {
                     MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
-                    MainActivity.message_list_fragment.modify_message(m);
+                    MyMainActivity.message_list_fragment.modify_message(m);
                 }
             }
         }
@@ -603,7 +603,7 @@ public class HelperMessage
 
         try
         {
-            new MainActivity.delete_selected_messages_asynchtask(c, progressDialog2, update_message_list,
+            new MyMainActivity.delete_selected_messages_asynchtask(c, progressDialog2, update_message_list,
                                                                  update_friend_list, dialog_text).execute();
         }
         catch (Exception e)
@@ -661,7 +661,7 @@ public class HelperMessage
                 try
                 {
                     // need to redraw all items again here, to remove the selections
-                    MainActivity.message_list_fragment.adapter.redraw_all_items();
+                    MyMainActivity.message_list_fragment.adapter.redraw_all_items();
                 }
                 catch (Exception e)
                 {
@@ -699,7 +699,7 @@ public class HelperMessage
                 Log.i(TAG, "save_selected_messages:EE1:" + e3.getMessage());
             }
 
-            new MainActivity.save_selected_messages_asynchtask(c, progressDialog2).execute();
+            new MyMainActivity.save_selected_messages_asynchtask(c, progressDialog2).execute();
         }
         catch (Exception e)
         {

@@ -28,8 +28,8 @@ import java.util.concurrent.Semaphore;
 
 import static com.zoffcc.applications.trifa.AudioReceiver.reinit_audio_play_buffers;
 import static com.zoffcc.applications.trifa.AudioRecording.microphone_muted;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__X_eac_delay_ms;
-import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
+import static com.zoffcc.applications.trifa.MyMainActivity.PREF__X_eac_delay_ms;
+import static com.zoffcc.applications.trifa.MyMainActivity.PREF_mic_gain_factor;
 
 public class NativeAudio
 {

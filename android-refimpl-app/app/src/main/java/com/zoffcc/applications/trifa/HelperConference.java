@@ -90,7 +90,7 @@ public class HelperConference
                 try
                 {
                     // need to redraw all items again here, to remove the selections
-                    MainActivity.conference_message_list_fragment.adapter.redraw_all_items();
+                    MyMainActivity.conference_message_list_fragment.adapter.redraw_all_items();
                 }
                 catch (Exception e)
                 {
@@ -111,7 +111,7 @@ public class HelperConference
 
         try
         {
-            new MainActivity.delete_selected_conference_messages_asynchtask(c, progressDialog2,
+            new MyMainActivity.delete_selected_conference_messages_asynchtask(c, progressDialog2,
                                                                             update_conf_message_list,
                                                                             dialog_text).execute();
         }
@@ -167,11 +167,11 @@ public class HelperConference
 
         try
         {
-            if (MainActivity.conference_message_list_activity != null)
+            if (MyMainActivity.conference_message_list_activity != null)
             {
-                if (MainActivity.conference_message_list_activity.get_current_conf_id().equals(conference_identifier))
+                if (MyMainActivity.conference_message_list_activity.get_current_conf_id().equals(conference_identifier))
                 {
-                    MainActivity.conference_message_list_activity.set_conference_connection_status_icon();
+                    MyMainActivity.conference_message_list_activity.set_conference_connection_status_icon();
                 }
             }
         }
@@ -651,7 +651,7 @@ public class HelperConference
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                 cc.is_friend = false;
                 cc.conference_item = ConferenceDB.deep_copy(conf3);
-                MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+                MyMainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
             }
             catch (Exception e3)
             {
@@ -686,7 +686,7 @@ public class HelperConference
                     CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                     cc.is_friend = false;
                     cc.conference_item = ConferenceDB.deep_copy(conf_new);
-                    MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+                    MyMainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                 }
                 catch (Exception e4)
                 {
@@ -705,14 +705,14 @@ public class HelperConference
 
     static void update_single_conference_in_friendlist_view(final ConferenceDB conf)
     {
-        if (MainActivity.friend_list_fragment != null)
+        if (MyMainActivity.friend_list_fragment != null)
         {
             if (conf != null)
             {
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                 cc.is_friend = false;
                 cc.conference_item = conf;
-                MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+                MyMainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
             }
         }
     }

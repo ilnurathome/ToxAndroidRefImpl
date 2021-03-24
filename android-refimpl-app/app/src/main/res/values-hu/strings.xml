@@ -244,31 +244,31 @@
     
     
     
-    <string name="MainActivity_profile">Profil</string>
-    <string name="MainActivity_settings">Beállítások</string>
-    <string name="MainActivity_logout_login">Kilépés /Belépés</string>
-    <string name="MainActivity_maint">Karbantartás</string>
-    <string name="MainActivity_about">Ról ről</string>
-    <string name="MainActivity_exit">Kijárat</string>
-    <string name="MainActivity_available">Elérhető</string>
-    <string name="MainActivity_away">El</string>
-    <string name="MainActivity_busy">Elfoglalt</string>
-    <string name="MainActivity_no_button">nem</string>
-    <string name="MainActivity_ok_take_me_there_button">OK, vigyél oda</string>
-    <string name="MainActivity_info_dialog_title">INFO</string>
-    <string name="MainActivity_add_to_batt_opt">Kérjük, vegye fel a TRIfA-t az akkumulátoroptimalizálás kivétellistájához!</string>
-    <string name="MainActivity_friend_is_typing">barátja gépel ...</string>
-    <string name="MainActivity_notification_new_message">új üzenet</string>
-    <string name="MainActivity_notification_new_message2">új üzenet</string>
-    <string name="MainActivity_button_ok">Rendben</string>
-    <string name="MainActivity_error_starting_email_app">Hiba az e-mail alkalmazás indításakor</string>
-    <string name="MainActivity_no_email_app_found">Nem található e-mail alkalmazás</string>
-    <string name="MainActivity_toast_msg_deleted">Az üzenetek törölve</string>
-    <string name="MainActivity_toast_msg_exported">Exportált üzenetek</string>
-    <string name="MainActivity_toast_msgs_deleted">Az üzenetek törölve</string>
-    <string name="MainActivity_notification_new_message3">új üzenet</string>
-    <string name="MainActivity_notification_new_message4">új üzenet</string>
-    <string name="MainActivity_notification_new_message5">új üzenet</string>
+    <string name="MyMainActivity_profile">Profil</string>
+    <string name="MyMainActivity_settings">Beállítások</string>
+    <string name="MyMainActivity_logout_login">Kilépés /Belépés</string>
+    <string name="MyMainActivity_maint">Karbantartás</string>
+    <string name="MyMainActivity_about">Ról ről</string>
+    <string name="MyMainActivity_exit">Kijárat</string>
+    <string name="MyMainActivity_available">Elérhető</string>
+    <string name="MyMainActivity_away">El</string>
+    <string name="MyMainActivity_busy">Elfoglalt</string>
+    <string name="MyMainActivity_no_button">nem</string>
+    <string name="MyMainActivity_ok_take_me_there_button">OK, vigyél oda</string>
+    <string name="MyMainActivity_info_dialog_title">INFO</string>
+    <string name="MyMainActivity_add_to_batt_opt">Kérjük, vegye fel a TRIfA-t az akkumulátoroptimalizálás kivétellistájához!</string>
+    <string name="MyMainActivity_friend_is_typing">barátja gépel ...</string>
+    <string name="MyMainActivity_notification_new_message">új üzenet</string>
+    <string name="MyMainActivity_notification_new_message2">új üzenet</string>
+    <string name="MyMainActivity_button_ok">Rendben</string>
+    <string name="MyMainActivity_error_starting_email_app">Hiba az e-mail alkalmazás indításakor</string>
+    <string name="MyMainActivity_no_email_app_found">Nem található e-mail alkalmazás</string>
+    <string name="MyMainActivity_toast_msg_deleted">Az üzenetek törölve</string>
+    <string name="MyMainActivity_toast_msg_exported">Exportált üzenetek</string>
+    <string name="MyMainActivity_toast_msgs_deleted">Az üzenetek törölve</string>
+    <string name="MyMainActivity_notification_new_message3">új üzenet</string>
+    <string name="MyMainActivity_notification_new_message4">új üzenet</string>
+    <string name="MyMainActivity_notification_new_message5">új üzenet</string>
 
     <string name="Aboutpage_0">TRIfA Crashlog</string>
     <string name="Aboutpage_2">Küldjön összeomlási jelentést e-mailben</string>

@@ -44,6 +44,7 @@ public class CheckPasswordActivity extends AppCompatActivity
 
     // UI references.
     private EditText mPasswordView1;
+    private Boolean runMainActivity = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -51,6 +52,9 @@ public class CheckPasswordActivity extends AppCompatActivity
         Log.i(TAG, "onCreate");
 
         super.onCreate(savedInstanceState);
+        Bundle extras = getIntent().getExtras();
+        runMainActivity = extras.getBoolean("runMainActivity", true);
+
         setContentView(R.layout.activity_check_password);
 
         mPasswordView1 = (EditText) findViewById(R.id.password_1_c);
@@ -133,8 +137,14 @@ public class CheckPasswordActivity extends AppCompatActivity
 
         PREF__DB_secrect_key__user_hash = try_password_hash;
 
-        Intent main_act = new Intent(c, MainActivity.class);
-        startActivity(main_act);
+        if (runMainActivity == true) {
+            Intent main_act = new Intent(c, MyMainActivity.class);
+            startActivity(main_act);
+        } else {
+            Intent intent = new Intent();
+            intent.putExtra("PREF__DB_secrect_key__user_hash", PREF__DB_secrect_key__user_hash);
+            setResult(0, intent);
+        }
         finish();
     }
 

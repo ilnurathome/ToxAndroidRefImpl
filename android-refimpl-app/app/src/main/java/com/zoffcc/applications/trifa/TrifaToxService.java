@@ -432,7 +432,7 @@ public class TrifaToxService extends Service
         boolean exists_in_db = false;
         //                try
         //                {
-        //                    MainActivity.friend_list_fragment.clear_friends();
+        //                    MyMainActivity.friend_list_fragment.clear_friends();
         //                }
         //                catch (Exception e)
         //                {
@@ -501,11 +501,11 @@ public class TrifaToxService extends Service
             // ----- would be double in list -----
             // ----- would be double in list -----
             // ----- would be double in list -----
-            //                    if (MainActivity.friend_list_fragment != null)
+            //                    if (MyMainActivity.friend_list_fragment != null)
             //                    {
             //                        try
             //                        {
-            //                            MainActivity.friend_list_fragment.add_friends(f);
+            //                            MyMainActivity.friend_list_fragment.add_friends(f);
             //                        }
             //                        catch (Exception e)
             //                        {
@@ -541,13 +541,13 @@ public class TrifaToxService extends Service
 
                 try
                 {
-                    if (MainActivity.friend_list_fragment != null)
+                    if (MyMainActivity.friend_list_fragment != null)
                     {
                         // reload friend in friendlist
                         CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                         cc.is_friend = true;
                         cc.friend_item = fl_check.get(0);
-                        MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+                        MyMainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                     }
                 }
                 catch (Exception e)

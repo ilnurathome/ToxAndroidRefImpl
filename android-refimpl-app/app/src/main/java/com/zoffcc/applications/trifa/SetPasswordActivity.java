@@ -56,11 +56,14 @@ public class SetPasswordActivity extends AppCompatActivity
     private View mLoginFormView;
 
     private SharedPreferences settings;
+    private boolean runMainActivity = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        Bundle extras = getIntent().getExtras();
+        runMainActivity = extras.getBoolean("runMainActivity", true);
 
         Log.i(TAG, "onCreate");
 
@@ -107,8 +110,14 @@ public class SetPasswordActivity extends AppCompatActivity
                 auto_create_password();
                 settings.edit().putBoolean("PW_SET_SCREEN_DONE", true).commit();
                 // ok open main activity
-                Intent main_act = new Intent(SetPasswordActivity.this, MainActivity.class);
-                startActivity(main_act);
+                if (runMainActivity == true) {
+                    Intent main_act = new Intent(SetPasswordActivity.this, MyMainActivity.class);
+                    startActivity(main_act);
+                } else {
+                    Intent intent = new Intent();
+                    intent.putExtra("PREF__DB_secrect_key__user_hash", PREF__DB_secrect_key__user_hash);
+                    setResult(0, intent);
+                }
                 finish();
             }
         });
@@ -297,8 +306,10 @@ public class SetPasswordActivity extends AppCompatActivity
             {
                 settings.edit().putBoolean("PW_SET_SCREEN_DONE", true).commit();
                 // ok open main activity
-                Intent main_act = new Intent(SetPasswordActivity.this, MainActivity.class);
-                startActivity(main_act);
+                if (runMainActivity == true) {
+                    Intent main_act = new Intent(SetPasswordActivity.this, MyMainActivity.class);
+                    startActivity(main_act);
+                }
                 finish();
             }
             else

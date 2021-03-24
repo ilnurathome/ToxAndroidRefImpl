@@ -47,7 +47,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
+import static com.zoffcc.applications.trifa.MyMainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MessageListActivity.add_quote_message_text;
@@ -200,23 +200,23 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         int my_position = this.getAdapterPosition();
         if (my_position != RecyclerView.NO_POSITION)
         {
-            if (MainActivity.message_list_fragment != null)
+            if (MyMainActivity.message_list_fragment != null)
             {
-                if (MainActivity.message_list_fragment.adapter != null)
+                if (MyMainActivity.message_list_fragment.adapter != null)
                 {
                     if (my_position < 1)
                     {
                         message_text_date_string.setText(
-                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                                MyMainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                         message_text_date.setVisibility(View.VISIBLE);
                     }
                     else
                     {
-                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(
-                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
+                        if (!MyMainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(
+                                MyMainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
                         {
                             message_text_date_string.setText(
-                                    MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                                    MyMainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
                             message_text_date.setVisibility(View.VISIBLE);
                         }
                     }

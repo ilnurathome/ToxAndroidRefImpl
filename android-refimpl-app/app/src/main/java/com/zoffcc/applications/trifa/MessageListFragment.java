@@ -224,7 +224,7 @@ public class MessageListFragment extends Fragment
         // a = new MessagelistArrayAdapter(context, data_values);
         // setListAdapter(a);
 
-        // MainActivity.message_list_fragment = this;
+        // MyMainActivity.message_list_fragment = this;
 
         is_data_loaded = true;
 
@@ -301,7 +301,7 @@ public class MessageListFragment extends Fragment
         }
 
         is_data_loaded = false;
-        MainActivity.message_list_fragment = this;
+        MyMainActivity.message_list_fragment = this;
     }
 
     @Override
@@ -311,7 +311,7 @@ public class MessageListFragment extends Fragment
         super.onPause();
 
         global_showing_messageview = false;
-        MainActivity.message_list_fragment = null;
+        MyMainActivity.message_list_fragment = null;
     }
 
     void update_all_messages(boolean always)

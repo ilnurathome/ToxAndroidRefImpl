@@ -72,7 +72,7 @@ import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.remove_own_relay_in_db;
 import static com.zoffcc.applications.trifa.Identicon.IDENTICON_ROWS;
 import static com.zoffcc.applications.trifa.MainActivity.clipboard;
-import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
+import static com.zoffcc.applications.trifa.MyMainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_SELF_MAX_BYTE_SIZE;

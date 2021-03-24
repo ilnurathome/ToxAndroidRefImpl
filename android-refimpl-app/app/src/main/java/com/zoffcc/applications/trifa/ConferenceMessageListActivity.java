@@ -152,7 +152,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_conference_message_list);
 
-        MainActivity.conference_message_list_activity = this;
+        MyMainActivity.conference_message_list_activity = this;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -280,7 +280,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         // all messages
                         conf_search_messages_text = null;
-                        MainActivity.conference_message_list_fragment.update_all_messages(true);
+                        MyMainActivity.conference_message_list_fragment.update_all_messages(true);
                     }
                     catch (Exception e2)
                     {
@@ -293,7 +293,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         // all messages and search string
                         conf_search_messages_text = query;
-                        MainActivity.conference_message_list_fragment.update_all_messages(true);
+                        MyMainActivity.conference_message_list_fragment.update_all_messages(true);
                     }
                     catch (Exception e2)
                     {
@@ -315,7 +315,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         // all messages
                         conf_search_messages_text = null;
-                        MainActivity.conference_message_list_fragment.update_all_messages(true);
+                        MyMainActivity.conference_message_list_fragment.update_all_messages(true);
                     }
                     catch (Exception e2)
                     {
@@ -328,7 +328,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         // all messages and search string
                         conf_search_messages_text = query;
-                        MainActivity.conference_message_list_fragment.update_all_messages(true);
+                        MyMainActivity.conference_message_list_fragment.update_all_messages(true);
                     }
                     catch (Exception e2)
                     {
@@ -482,8 +482,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         Log.i(TAG, "onPause");
         super.onPause();
 
-        MainActivity.conference_message_list_fragment = null;
-        MainActivity.conference_message_list_activity = null;
+        MyMainActivity.conference_message_list_fragment = null;
+        MyMainActivity.conference_message_list_activity = null;
         // Log.i(TAG, "onPause:001:conf_id=" + conf_id);
         conf_id = "-1";
         // Log.i(TAG, "onPause:002:conf_id=" + conf_id);
@@ -516,7 +516,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, conf_id);
 
-        MainActivity.conference_message_list_activity = this;
+        MyMainActivity.conference_message_list_activity = this;
         wakeup_tox_thread();
     }
 
@@ -792,7 +792,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                 {
                     try
                     {
-                        amode = MainActivity.conference_message_list_activity.startSupportActionMode(
+                        amode = MyMainActivity.conference_message_list_activity.startSupportActionMode(
                                 new ToolbarActionMode(context));
                         v.setBackgroundColor(Color.GRAY);
                         ret.is_selected = true;

@@ -47,7 +47,7 @@ import static com.zoffcc.applications.trifa.MainActivity.AEC_DEBUG_DUMP;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
-import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
+import static com.zoffcc.applications.trifa.MyMainActivity.PREF_mic_gain_factor;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_JNI_audio_buffer;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_audio_send_frame;

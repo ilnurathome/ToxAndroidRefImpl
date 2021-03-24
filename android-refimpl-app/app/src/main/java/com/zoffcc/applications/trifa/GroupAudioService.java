@@ -477,7 +477,7 @@ public class GroupAudioService extends Service
         b.setCustomContentView(views);
         b.setCustomBigContentView(bigViews);
 
-        Intent notificationIntent = new Intent(this, MainActivity.class);
+        Intent notificationIntent = new Intent(this, MyMainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 

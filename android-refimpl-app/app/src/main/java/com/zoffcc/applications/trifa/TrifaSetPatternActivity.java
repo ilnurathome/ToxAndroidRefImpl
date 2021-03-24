@@ -51,7 +51,7 @@ public class TrifaSetPatternActivity extends SetPatternActivity
         Log.i(TAG, "onSetPattern:pattern=" + patternSha256);
 
         // ok open main activity
-        Intent main_act = new Intent(TrifaSetPatternActivity.this, MainActivity.class);
+        Intent main_act = new Intent(TrifaSetPatternActivity.this, MyMainActivity.class);
         startActivity(main_act);
         finish();
     }

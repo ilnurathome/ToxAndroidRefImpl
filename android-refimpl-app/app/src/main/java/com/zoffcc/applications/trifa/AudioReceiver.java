@@ -28,8 +28,8 @@ import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import java.nio.ByteBuffer;
 
-import static com.zoffcc.applications.trifa.MainActivity.PREF__X_eac_delay_ms;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_play_buffer_custom;
+import static com.zoffcc.applications.trifa.MyMainActivity.PREF__X_eac_delay_ms;
+import static com.zoffcc.applications.trifa.MyMainActivity.PREF__X_audio_play_buffer_custom;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf01;

@@ -327,8 +327,8 @@ public class CrashActivity extends AppCompatActivity implements Logging.AsyncRes
 
         try
         {
-            Log.i(TAG, "processFinish:MainActivity.main_activity_s=" + MainActivity.main_activity_s);
-            MainActivity.main_activity_s.sendEmailWithAttachment(this, "feedback@zanavi.cc",
+            Log.i(TAG, "processFinish:MyMainActivity.main_activity_s=" + MyMainActivity.main_activity_s);
+            MyMainActivity.main_activity_s.sendEmailWithAttachment(this, "feedback@zanavi.cc",
                                                                  "TRIfA Crashlog (a:" + android.os.Build.VERSION.SDK +
                                                                  ")", feedback_text, full_file_name,
                                                                  full_file_name_suppl);

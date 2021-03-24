@@ -48,7 +48,7 @@ public class HelperToxNotification
         Log.i(TAG, "tox_notification_setup:start");
         Notification notification2 = null;
 
-        Intent notificationIntent = new Intent(c, MainActivity.class);
+        Intent notificationIntent = new Intent(c, MyMainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(c, 0, notificationIntent, 0);
 
@@ -160,7 +160,7 @@ public class HelperToxNotification
             b_new = null;
             b = new NotificationCompat.Builder(c);
         }
-        Intent notificationIntent = new Intent(c, MainActivity.class);
+        Intent notificationIntent = new Intent(c, MyMainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {

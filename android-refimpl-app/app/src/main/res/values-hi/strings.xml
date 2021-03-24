@@ -244,31 +244,31 @@
     
     
     
-    <string name="MainActivity_profile">प्रोफ़ाइल</string>
-    <string name="MainActivity_settings">समायोजन</string>
-    <string name="MainActivity_logout_login">लॉगआउट /लॉग इन</string>
-    <string name="MainActivity_maint">रखरखाव</string>
-    <string name="MainActivity_about">के बारे में</string>
-    <string name="MainActivity_exit">बाहर जाएं</string>
-    <string name="MainActivity_available">उपलब्ध</string>
-    <string name="MainActivity_away">दूर</string>
-    <string name="MainActivity_busy">व्यस्त</string>
-    <string name="MainActivity_no_button">नहीं</string>
-    <string name="MainActivity_ok_take_me_there_button">ठीक है, मुझे वहाँ ले चलो</string>
-    <string name="MainActivity_info_dialog_title">जानकारी</string>
-    <string name="MainActivity_add_to_batt_opt">कृपया Batteryoptimization की अपवाद सूची में TRIfA जोड़ें!</string>
-    <string name="MainActivity_friend_is_typing">दोस्त टाइप कर रहा है ...</string>
-    <string name="MainActivity_notification_new_message">नया संदेश</string>
-    <string name="MainActivity_notification_new_message2">नया संदेश</string>
-    <string name="MainActivity_button_ok">ठीक है</string>
-    <string name="MainActivity_error_starting_email_app">ईमेल ऐप शुरू करने में त्रुटि</string>
-    <string name="MainActivity_no_email_app_found">कोई ईमेल ऐप नहीं मिला</string>
-    <string name="MainActivity_toast_msg_deleted">संदेश हटाए गए</string>
-    <string name="MainActivity_toast_msg_exported">निर्यात किए गए संदेश</string>
-    <string name="MainActivity_toast_msgs_deleted">संदेश हटाए गए</string>
-    <string name="MainActivity_notification_new_message3">नया संदेश</string>
-    <string name="MainActivity_notification_new_message4">नया संदेश</string>
-    <string name="MainActivity_notification_new_message5">नया संदेश</string>
+    <string name="MyMainActivity_profile">प्रोफ़ाइल</string>
+    <string name="MyMainActivity_settings">समायोजन</string>
+    <string name="MyMainActivity_logout_login">लॉगआउट /लॉग इन</string>
+    <string name="MyMainActivity_maint">रखरखाव</string>
+    <string name="MyMainActivity_about">के बारे में</string>
+    <string name="MyMainActivity_exit">बाहर जाएं</string>
+    <string name="MyMainActivity_available">उपलब्ध</string>
+    <string name="MyMainActivity_away">दूर</string>
+    <string name="MyMainActivity_busy">व्यस्त</string>
+    <string name="MyMainActivity_no_button">नहीं</string>
+    <string name="MyMainActivity_ok_take_me_there_button">ठीक है, मुझे वहाँ ले चलो</string>
+    <string name="MyMainActivity_info_dialog_title">जानकारी</string>
+    <string name="MyMainActivity_add_to_batt_opt">कृपया Batteryoptimization की अपवाद सूची में TRIfA जोड़ें!</string>
+    <string name="MyMainActivity_friend_is_typing">दोस्त टाइप कर रहा है ...</string>
+    <string name="MyMainActivity_notification_new_message">नया संदेश</string>
+    <string name="MyMainActivity_notification_new_message2">नया संदेश</string>
+    <string name="MyMainActivity_button_ok">ठीक है</string>
+    <string name="MyMainActivity_error_starting_email_app">ईमेल ऐप शुरू करने में त्रुटि</string>
+    <string name="MyMainActivity_no_email_app_found">कोई ईमेल ऐप नहीं मिला</string>
+    <string name="MyMainActivity_toast_msg_deleted">संदेश हटाए गए</string>
+    <string name="MyMainActivity_toast_msg_exported">निर्यात किए गए संदेश</string>
+    <string name="MyMainActivity_toast_msgs_deleted">संदेश हटाए गए</string>
+    <string name="MyMainActivity_notification_new_message3">नया संदेश</string>
+    <string name="MyMainActivity_notification_new_message4">नया संदेश</string>
+    <string name="MyMainActivity_notification_new_message5">नया संदेश</string>
 
     <string name="Aboutpage_0">TRIfA क्रैशलॉग</string>
     <string name="Aboutpage_2">ईमेल के माध्यम से क्रैश रिपोर्ट भेजें</string>

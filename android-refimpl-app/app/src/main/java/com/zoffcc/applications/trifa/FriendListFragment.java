@@ -81,7 +81,7 @@ public class FriendListFragment extends Fragment
         adapter.clear_items(); // clears friends AND conferences!!
         adapter.notifyDataSetChanged();
 
-        MainActivity.friend_list_fragment = this;
+        MyMainActivity.friend_list_fragment = this;
         // -------------------------------------------
         // -------------------------------------------
         // -------------------------------------------
@@ -95,7 +95,7 @@ public class FriendListFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
         Log.i(TAG, "onActivityCreated");
 
-        MainActivity.friend_list_fragment = this;
+        MyMainActivity.friend_list_fragment = this;
     }
 
     @Override
@@ -406,7 +406,7 @@ public class FriendListFragment extends Fragment
             }
         }
 
-        MainActivity.friend_list_fragment = this;
+        MyMainActivity.friend_list_fragment = this;
     }
 
     synchronized void add_all_friends_clear(final int delay)

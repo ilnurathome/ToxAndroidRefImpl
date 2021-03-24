@@ -267,32 +267,32 @@
     <!-- Java Source texts -->
     <!-- Java Source texts -->
     <!-- Java Source texts -->
-    <string name="MainActivity_profile">ಜಾತಕ</string>
-    <string name="MainActivity_settings">ಸಂಯೋಜನೆ</string>
-    <string name="MainActivity_logout_login">ಲಾಗ್ ಔಟ್/ಲಾಗಿನ್ ಮಾಡಿ</string>
-    <string name="MainActivity_maint">ನಿರ್ವಹಣೆ</string>
-    <string name="MainActivity_about">ನಮ್ಮ ಬಗ್ಗೆ</string>
-    <string name="MainActivity_exit">ನಿರ್ಗಮನ</string>
-    <string name="MainActivity_available">ಇರುವೆ</string>
-    <string name="MainActivity_away">ದೂರವಿರುವೆ</string>
-    <string name="MainActivity_busy">ನಿರತನಾಗಿರುವೆ</string>
-    <string name="MainActivity_no_button">ಇಲ್ಲ</string>
-    <string name="MainActivity_ok_take_me_there_button">ಓಕೆ ಅಲ್ಲಿಗೆ ಕರೆದುಕೊಂಡು ಹೋಗು</string>
-    <string name="MainActivity_info_dialog_title">ಮಾಹಿತಿ</string>
-    <string name="MainActivity_add_to_batt_opt">Please add TRIfA to the exception list for Batteryoptimization!</string>
-    <string name="MainActivity_friend_is_typing">ಗೆಳೆಯ ಟೈಪಿಸುತ್ತಿದ್ದಾನೆ..</string>
-    <string name="MainActivity_notification_new_message">ಹೊಸ  ಸಂದೇಶ</string>
-    <string name="MainActivity_notification_new_message_title" translatable="false">TRIfA</string>
-    <string name="MainActivity_notification_new_message2">ಹೊಸ ಸಂದೇಶ</string>
-    <string name="MainActivity_button_ok">ಸರಿ</string>
-    <string name="MainActivity_error_starting_email_app">ಇಮೇಲ್ ಅಪ್ಲಿಕೇಶನ್ ಶುರುವಾಗುವಾಗ ತಪ್ಪಿದೆ</string>
-    <string name="MainActivity_no_email_app_found">ಇಮೇಲ್ ಅಪ್ಲಿಕೇಶನ್ ಸಿಗಲಿಲ್ಲ </string>
-    <string name="MainActivity_toast_msg_deleted">ಸಂದೇಶಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ</string>
-    <string name="MainActivity_toast_msg_exported">ಸಂದೇಶಗಳನ್ನು ರಫ್ತು ಮಾಡಲಾಗಿದೆ</string>
-    <string name="MainActivity_toast_msgs_deleted">ಸಂದೇಶಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ</string>
-    <string name="MainActivity_notification_new_message3">ಹೊಸ ಸಂದೇಶ</string>
-    <string name="MainActivity_notification_new_message4">ಹೊಸ ಸಂದೇಶ</string>
-    <string name="MainActivity_notification_new_message5">ಹೊಸ ಸಂದೇಶ</string>
+    <string name="MyMainActivity_profile">ಜಾತಕ</string>
+    <string name="MyMainActivity_settings">ಸಂಯೋಜನೆ</string>
+    <string name="MyMainActivity_logout_login">ಲಾಗ್ ಔಟ್/ಲಾಗಿನ್ ಮಾಡಿ</string>
+    <string name="MyMainActivity_maint">ನಿರ್ವಹಣೆ</string>
+    <string name="MyMainActivity_about">ನಮ್ಮ ಬಗ್ಗೆ</string>
+    <string name="MyMainActivity_exit">ನಿರ್ಗಮನ</string>
+    <string name="MyMainActivity_available">ಇರುವೆ</string>
+    <string name="MyMainActivity_away">ದೂರವಿರುವೆ</string>
+    <string name="MyMainActivity_busy">ನಿರತನಾಗಿರುವೆ</string>
+    <string name="MyMainActivity_no_button">ಇಲ್ಲ</string>
+    <string name="MyMainActivity_ok_take_me_there_button">ಓಕೆ ಅಲ್ಲಿಗೆ ಕರೆದುಕೊಂಡು ಹೋಗು</string>
+    <string name="MyMainActivity_info_dialog_title">ಮಾಹಿತಿ</string>
+    <string name="MyMainActivity_add_to_batt_opt">Please add TRIfA to the exception list for Batteryoptimization!</string>
+    <string name="MyMainActivity_friend_is_typing">ಗೆಳೆಯ ಟೈಪಿಸುತ್ತಿದ್ದಾನೆ..</string>
+    <string name="MyMainActivity_notification_new_message">ಹೊಸ  ಸಂದೇಶ</string>
+    <string name="MyMainActivity_notification_new_message_title" translatable="false">TRIfA</string>
+    <string name="MyMainActivity_notification_new_message2">ಹೊಸ ಸಂದೇಶ</string>
+    <string name="MyMainActivity_button_ok">ಸರಿ</string>
+    <string name="MyMainActivity_error_starting_email_app">ಇಮೇಲ್ ಅಪ್ಲಿಕೇಶನ್ ಶುರುವಾಗುವಾಗ ತಪ್ಪಿದೆ</string>
+    <string name="MyMainActivity_no_email_app_found">ಇಮೇಲ್ ಅಪ್ಲಿಕೇಶನ್ ಸಿಗಲಿಲ್ಲ </string>
+    <string name="MyMainActivity_toast_msg_deleted">ಸಂದೇಶಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ</string>
+    <string name="MyMainActivity_toast_msg_exported">ಸಂದೇಶಗಳನ್ನು ರಫ್ತು ಮಾಡಲಾಗಿದೆ</string>
+    <string name="MyMainActivity_toast_msgs_deleted">ಸಂದೇಶಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ</string>
+    <string name="MyMainActivity_notification_new_message3">ಹೊಸ ಸಂದೇಶ</string>
+    <string name="MyMainActivity_notification_new_message4">ಹೊಸ ಸಂದೇಶ</string>
+    <string name="MyMainActivity_notification_new_message5">ಹೊಸ ಸಂದೇಶ</string>
 
     <string name="Aboutpage_0">TRIfA Crashlog</string>
     <string name="Aboutpage_1" translatable="false">https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/README.md</string>

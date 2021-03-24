@@ -90,9 +90,7 @@ import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
-import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
@@ -101,6 +99,8 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
 import static com.zoffcc.applications.trifa.MessageListFragment.search_messages_text;
 import static com.zoffcc.applications.trifa.MessageListFragment.show_only_files;
+import static com.zoffcc.applications.trifa.MyMainActivity.main_activity_s;
+import static com.zoffcc.applications.trifa.MyMainActivity.message_list_activity;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
@@ -245,7 +245,7 @@ public class MessageListActivity extends AppCompatActivity
                             messageSearchView.setIconified(true);
                             show_only_files = false;
                             search_messages_text = null;
-                            MainActivity.message_list_fragment.update_all_messages(true);
+                            MyMainActivity.message_list_fragment.update_all_messages(true);
                         }
                         else if (id == 1)
                         {
@@ -254,7 +254,7 @@ public class MessageListActivity extends AppCompatActivity
                             messageSearchView.setIconified(true);
                             show_only_files = true;
                             search_messages_text = null;
-                            MainActivity.message_list_fragment.update_all_messages(true);
+                            MyMainActivity.message_list_fragment.update_all_messages(true);
                         }
                     }
                     catch (Exception e2)
@@ -323,7 +323,7 @@ public class MessageListActivity extends AppCompatActivity
                         // all messages
                         show_only_files = false;
                         search_messages_text = null;
-                        MainActivity.message_list_fragment.update_all_messages(true);
+                        MyMainActivity.message_list_fragment.update_all_messages(true);
                     }
                     catch (Exception e2)
                     {
@@ -337,7 +337,7 @@ public class MessageListActivity extends AppCompatActivity
                         // all messages and search string
                         show_only_files = false;
                         search_messages_text = query;
-                        MainActivity.message_list_fragment.update_all_messages(true);
+                        MyMainActivity.message_list_fragment.update_all_messages(true);
                     }
                     catch (Exception e2)
                     {
@@ -360,7 +360,7 @@ public class MessageListActivity extends AppCompatActivity
                         // all messages
                         show_only_files = false;
                         MessageListFragment.search_messages_text = null;
-                        MainActivity.message_list_fragment.update_all_messages(true);
+                        MyMainActivity.message_list_fragment.update_all_messages(true);
                     }
                     catch (Exception e2)
                     {
@@ -374,7 +374,7 @@ public class MessageListActivity extends AppCompatActivity
                         // all messages and search string
                         show_only_files = false;
                         MessageListFragment.search_messages_text = query;
-                        MainActivity.message_list_fragment.update_all_messages(true);
+                        MyMainActivity.message_list_fragment.update_all_messages(true);
                     }
                     catch (Exception e2)
                     {
@@ -583,7 +583,7 @@ public class MessageListActivity extends AppCompatActivity
     {
         try
         {
-            Log.i(TAG, "is_at_bottom=" + MainActivity.message_list_fragment.is_at_bottom);
+            Log.i(TAG, "is_at_bottom=" + MyMainActivity.message_list_fragment.is_at_bottom);
         }
         catch (Exception e)
         {
@@ -599,7 +599,7 @@ public class MessageListActivity extends AppCompatActivity
             emojiPopup.dismiss();
         }
 
-        // ** // MainActivity.message_list_fragment = null;
+        // ** // MyMainActivity.message_list_fragment = null;
         message_list_activity = null;
         Log.i(TAG, "onPause:001:friendnum=" + friendnum);
         friendnum = -1;
@@ -695,7 +695,7 @@ public class MessageListActivity extends AppCompatActivity
 
         try
         {
-            Log.i(TAG, "is_at_bottom=" + MainActivity.message_list_fragment.is_at_bottom);
+            Log.i(TAG, "is_at_bottom=" + MyMainActivity.message_list_fragment.is_at_bottom);
         }
         catch (Exception e)
         {
@@ -1885,4 +1885,5 @@ public class MessageListActivity extends AppCompatActivity
         ret.ret_value = true;
         return ret;
     }
+
 }

@@ -73,14 +73,14 @@
             android:name=".StartMainActivityWrapper"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:launchMode="singleTask">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".MyMainActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:launchMode="singleTask">
         </activity>
@@ -251,6 +251,15 @@
             android:enabled="true"
             android:exported="false">
         </service>
+        <service
+            android:name=".MainService"
+            android:enabled="true"
+            android:exported="false"></service>
+
+        <service
+            android:name=".MainActivity"
+            android:enabled="true"
+            android:exported="false"></service>
 
         <service
             android:name=".GroupAudioService"
@@ -284,7 +293,7 @@
 
         <provider
             android:name=".GenericFileProvider"
-            android:authorities="com.zoffcc.applications.trifa.provider"
+            android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

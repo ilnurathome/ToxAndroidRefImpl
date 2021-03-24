@@ -24,90 +24,53 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.ProgressDialog;
-import android.bluetooth.BluetoothHeadset;
-import android.content.ActivityNotFoundException;
+import android.app.Service;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.LabeledIntent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.ImageFormat;
-import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
+import android.os.Binder;
 import android.os.Handler;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RemoteViews;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.Nullable;
 
 import com.github.gfx.android.orma.AccessThreadConstraint;
 import com.github.gfx.android.orma.encryption.EncryptedDatabase;
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
-import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.AccountHeader;
-import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
-import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
-import com.mikepenz.materialdrawer.model.interfaces.IProfile;
-import com.vanniktech.emoji.EmojiManager;
-import com.vanniktech.emoji.ios.IosEmojiProvider;
 import com.yariksoffice.lingver.Lingver;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
 import androidx.renderscript.Allocation;
 import androidx.renderscript.Element;
 import androidx.renderscript.RenderScript;
@@ -117,7 +80,6 @@ import info.guardianproject.iocipher.VirtualFileSystem;
 import info.guardianproject.netcipher.proxy.OrbotHelper;
 import info.guardianproject.netcipher.proxy.StatusCallback;
 import permissions.dispatcher.NeedsPermission;
-import permissions.dispatcher.RuntimePermissions;
 
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
@@ -127,7 +89,6 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
-import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
@@ -142,11 +103,13 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_file
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
-import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
-import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
+import static com.zoffcc.applications.trifa.MyMainActivity.conference_message_list_activity;
+import static com.zoffcc.applications.trifa.MyMainActivity.main_activity_s;
+import static com.zoffcc.applications.trifa.MyMainActivity.message_list_activity;
+import static com.zoffcc.applications.trifa.MyMainActivity.tox_mainactivity_fg;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN;
@@ -165,7 +128,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_SYNC_DOUBLE_INT
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY_NEED_ACK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
@@ -195,7 +157,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_o
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timestamp;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroupview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.global_tox_self_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_received;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.orbot_is_really_running;
@@ -227,9 +188,6 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_AWAY;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_BUSY;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE;
 import static com.zoffcc.applications.trifa.TrifaToxService.TOX_SERVICE_STARTED;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -247,16 +205,17 @@ fn=1 res=1 msg=🍔👍😜👍😜 @%\4äö ubnc Ovid n JB von in BK ni ubvzv8 
  */
 
 @SuppressWarnings("JniMissingFunction")
-@RuntimePermissions
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends Service
 {
+    private final IBinder binder  = new LocalBinder();
+
     private static final String TAG = "trifa.MainActivity";
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
     final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
     final static boolean NDK_STDOUT_LOGGING = false; // set "false" for release builds
-    final static boolean ORMA_TRACE = false; // set "false" for release builds
+    final static boolean ORMA_TRACE = true; // set "false" for release builds
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
     final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
@@ -264,8 +223,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
 
-    static TextView mt = null;
-    ImageView top_imageview = null;
+
     static boolean native_lib_loaded = false;
     static boolean native_audio_lib_loaded = false;
     static String app_files_directory = "";
@@ -276,10 +234,7 @@ public class MainActivity extends AppCompatActivity
     Handler main_handler = null;
     static Handler main_handler_s = null;
     static Context context_s = null;
-    static MainActivity main_activity_s = null;
     static AudioManager audio_manager_s = null;
-    static Resources resources = null;
-    static DisplayMetrics metrics = null;
     static int AudioMode_old;
     static int RingerMode_old;
     static boolean isSpeakerPhoneOn_old;
@@ -300,11 +255,6 @@ public class MainActivity extends AppCompatActivity
     static int NOTIFICATION_ID = 293821038;
     static RemoteViews notification_view = null;
     static long[] friends = null;
-    static FriendListFragment friend_list_fragment = null;
-    static MessageListFragment message_list_fragment = null;
-    static MessageListActivity message_list_activity = null;
-    static ConferenceMessageListFragment conference_message_list_fragment = null;
-    static ConferenceMessageListActivity conference_message_list_activity = null;
     static ConferenceAudioActivity conference_audio_activity = null;
     final static String MAIN_DB_NAME = "main.db";
     final static String MAIN_VFS_NAME = "files.db";
@@ -367,7 +317,6 @@ public class MainActivity extends AppCompatActivity
     static int PREF__higher_video_quality = 0;
     static int PREF__higher_audio_quality = 1;
     static int PREF__video_call_quality = 0;
-    static int PREF__X_audio_play_buffer_custom = 0;
     static int PREF__udp_enabled = 0; // 0 -> Tox TCP mode, 1 -> Tox UDP mode
     static int PREF__audiosource = 2; // 1 -> VOICE_COMMUNICATION, 2 -> VOICE_RECOGNITION
     static boolean PREF__orbot_enabled = false;
@@ -385,13 +334,10 @@ public class MainActivity extends AppCompatActivity
     static String PREF__X_misc_button_msg = "t"; // TODO: hardcoded for now!
     static boolean PREF__U_keep_nospam = false;
     static boolean PREF__use_native_audio_play = true;
-    static boolean PREF__tox_set_do_not_sync_av = false;
     static boolean PREF__use_audio_rec_effects = false;
     static boolean PREF__window_security = false;
-    public static int PREF__X_eac_delay_ms = 80;
     static boolean PREF__force_udp_only = false;
     static boolean PREF__use_incognito_keyboard = true;
-    public static float PREF_mic_gain_factor = 2.0f;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
     static int FRAME_SIZE_FIXED = 40; // this is only for recording audio!
@@ -409,19 +355,10 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__auto_accept_video = false;
     static boolean PREF__auto_accept_all_upto = false;
     static int PREF__video_cam_resolution = 0;
-    static int PREF__global_font_size = 2;
 
     static String versionName = "";
     static int versionCode = -1;
     static PackageInfo packageInfo_s = null;
-    IntentFilter receiverFilter1 = null;
-    IntentFilter receiverFilter2 = null;
-    IntentFilter receiverFilter3 = null;
-    IntentFilter receiverFilter4 = null;
-    static HeadsetStateReceiver receiver1 = null;
-    static HeadsetStateReceiver receiver2 = null;
-    static HeadsetStateReceiver receiver3 = null;
-    static HeadsetStateReceiver receiver4 = null;
     static TextView waiting_view = null;
     static ProgressBar waiting_image = null;
     static ViewGroup normal_container = null;
@@ -463,10 +400,20 @@ public class MainActivity extends AppCompatActivity
     Spinner spinner_own_status = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
+    public int onStartCommand(Intent intent, int flags, int startId)
+    {
+        Log.i(TAG, "onStartCommand");
+        // this gets called all the time!
+        tox_mainactivity_fg = this;
+        return START_NOT_STICKY; // START_STICKY;
+    }
+
+
+    @Override
+    public void onCreate()
     {
         Log.i(TAG, "M:STARTUP:super onCreate");
-        super.onCreate(savedInstanceState);
+        super.onCreate();
         Log.i(TAG, "M:STARTUP:onCreate");
         Log.i(TAG, "onCreate");
 
@@ -475,41 +422,19 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "Lingver_Language: " + Lingver.getInstance().getLanguage());
         // Log.d(TAG, "Actual_Language: " + resources.configuration.getLocaleCompat());
 
-        resources = this.getResources();
-        metrics = resources.getDisplayMetrics();
         global_showing_messageview = false;
         global_showing_anygroupview = false;
 
-        Log.i(TAG, "M:STARTUP:setContentView start");
-        setContentView(R.layout.activity_main);
-        Log.i(TAG, "M:STARTUP:setContentView end");
-
-        mt = (TextView) this.findViewById(R.id.main_maintext);
-        mt.setText("...");
-        mt.setVisibility(View.VISIBLE);
         if (native_lib_loaded)
         {
             Log.i(TAG, "M:STARTUP:native_lib_loaded OK");
-            mt.setText("successfully loaded native library");
         }
         else
         {
             Log.i(TAG, "M:STARTUP:native_lib_loaded failed");
-            mt.setText("loadLibrary jni-c-toxcore failed!");
             show_wrong_credentials();
-            finish();
             return;
         }
-
-        Log.i(TAG, "M:STARTUP:toolbar");
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        Log.i(TAG, "M:STARTUP:EmojiManager install");
-        EmojiManager.install(new IosEmojiProvider());
-        // EmojiManager.install(new EmojiOneProvider());
-
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         PREF__DB_secrect_key = settings.getString("DB_secrect_key", "");
@@ -523,7 +448,6 @@ public class MainActivity extends AppCompatActivity
         main_handler = new Handler(getMainLooper());
         main_handler_s = main_handler;
         context_s = this.getBaseContext();
-        main_activity_s = this;
         TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX = (int) HelperGeneric.dp2px(10);
         TRIFAGlobals.CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX = (int) HelperGeneric.dp2px(20);
 
@@ -594,7 +518,6 @@ public class MainActivity extends AppCompatActivity
                     Log.i(TAG, "M:STARTUP:init DB:EE4");
                     Log.i(TAG, "db:EE4:" + e4.getMessage());
                     show_wrong_credentials();
-                    finish();
                     return;
                 }
                 // Log.i(TAG, "db:open(2)=OK:path=" + dbs_path);
@@ -664,11 +587,6 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        if (PREF__window_security)
-        {
-            // prevent screenshots and also dont show the window content in recent activity screen
-            initializeScreenshotSecurity(this);
-        }
 
         //        try
         //        {
@@ -707,13 +625,8 @@ public class MainActivity extends AppCompatActivity
         //            e.printStackTrace();
         //        }
         bootstrapping = false;
-        waiting_view = (TextView) findViewById(R.id.waiting_view);
-        waiting_image = (ProgressBar) findViewById(R.id.waiting_image);
-        normal_container = (ViewGroup) findViewById(R.id.normal_container);
-        waiting_view.setVisibility(View.GONE);
-        waiting_image.setVisibility(View.GONE);
-        normal_container.setVisibility(View.VISIBLE);
-        SD_CARD_TMP_DIR = getExternalFilesDir(null).getAbsolutePath() + "/tmpdir/";
+
+       SD_CARD_TMP_DIR = getExternalFilesDir(null).getAbsolutePath() + "/tmpdir/";
         SD_CARD_STATIC_DIR = getExternalFilesDir(null).getAbsolutePath() + "/_staticdir/";
         SD_CARD_FILES_EXPORT_DIR = getExternalFilesDir(null).getAbsolutePath() + "/vfs_export/";
         // Log.i(TAG, "SD_CARD_FILES_EXPORT_DIR:" + SD_CARD_FILES_EXPORT_DIR);
@@ -811,7 +724,7 @@ public class MainActivity extends AppCompatActivity
             PREF__X_battery_saving_timeout = 15;
         }
 
-        boolean tmp1 = settings.getBoolean("udp_enabled", false);
+        boolean tmp1 = settings.getBoolean("udp_enabled", true);
 
         if (tmp1)
         {
@@ -1097,297 +1010,8 @@ public class MainActivity extends AppCompatActivity
             PREF__video_cam_resolution = 0;
         }
 
-        try
-        {
-            PREF__global_font_size = Integer.parseInt(settings.getString("global_font_size", "" + 2));
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__global_font_size = 2;
-        }
-
         PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
 
-        // prefs ----------
-
-        // TODO: remake this into something nicer ----------
-        top_imageview = (ImageView) this.findViewById(R.id.main_maintopimage);
-        top_imageview.setVisibility(View.GONE);
-
-        if (PREF__U_keep_nospam == true)
-        {
-            top_imageview.setBackgroundColor(Color.TRANSPARENT);
-            // top_imageview.setBackgroundColor(Color.parseColor("#C62828"));
-            final Drawable d1 = new IconicsDrawable(this).
-                    icon(FontAwesome.Icon.faw_exclamation_circle).
-                    paddingDp(20).
-                    color(getResources().getColor(R.color.md_red_600)).
-                    sizeDp(100);
-            top_imageview.setImageDrawable(d1);
-        }
-        else
-        {
-            top_imageview.setBackgroundColor(Color.TRANSPARENT);
-            top_imageview.setImageResource(R.drawable.web_hi_res_512);
-        }
-
-        fadeInAndShowImage(top_imageview, 5000);
-        fadeOutAndHideImage(mt, 4000);
-        // TODO: remake this into something nicer ----------
-        // --------- status spinner ---------
-        spinner_own_status = (Spinner) findViewById(R.id.spinner_own_status);
-        ArrayList<String> own_online_status_string_values = new ArrayList<String>(
-                Arrays.asList(getString(R.string.MainActivity_available), getString(R.string.MainActivity_away),
-                              getString(R.string.MainActivity_busy)));
-        ArrayAdapter<String> myAdapter = new OwnStatusSpinnerAdapter(this, R.layout.own_status_spinner_item,
-                                                                     own_online_status_string_values);
-
-        if (spinner_own_status != null)
-        {
-            spinner_own_status.setAdapter(myAdapter);
-            spinner_own_status.setSelection(global_tox_self_status);
-            spinner_own_status.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-            {
-                @Override
-                public void onItemSelected(AdapterView<?> parentView, View v, int position, long id)
-                {
-                    if (is_tox_started)
-                    {
-                        try
-                        {
-                            if (id == 0)
-                            {
-                                // status: available
-                                tox_self_set_status(TOX_USER_STATUS_NONE.value);
-                                global_tox_self_status = TOX_USER_STATUS_NONE.value;
-                            }
-                            else if (id == 1)
-                            {
-                                // status: away
-                                tox_self_set_status(TOX_USER_STATUS_AWAY.value);
-                                global_tox_self_status = TOX_USER_STATUS_AWAY.value;
-                            }
-                            else if (id == 2)
-                            {
-                                // status: busy
-                                tox_self_set_status(TOX_USER_STATUS_BUSY.value);
-                                global_tox_self_status = TOX_USER_STATUS_BUSY.value;
-                            }
-                        }
-                        catch (Exception e2)
-                        {
-                            e2.printStackTrace();
-                        }
-                    }
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parentView)
-                {
-                    // your code here
-                }
-            });
-        }
-
-        // --------- status spinner ---------
-        // get permission ----------
-        Log.i(TAG, "M:STARTUP:permissions");
-        MainActivityPermissionsDispatcher.dummyForPermissions001WithPermissionCheck(this);
-        // get permission ----------
-        // -------- drawer ------------
-        // -------- drawer ------------
-        // -------- drawer ------------
-        Log.i(TAG, "M:STARTUP:drawer");
-        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName(
-                R.string.MainActivity_profile).withIcon(GoogleMaterial.Icon.gmd_face);
-        PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(
-                R.string.MainActivity_settings).withIcon(GoogleMaterial.Icon.gmd_settings);
-        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName(
-                R.string.MainActivity_logout_login).withIcon(GoogleMaterial.Icon.gmd_refresh);
-        PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName(
-                R.string.MainActivity_maint).withIcon(GoogleMaterial.Icon.gmd_build);
-        PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName(
-                R.string.MainActivity_about).withIcon(GoogleMaterial.Icon.gmd_info);
-        PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName(
-                R.string.MainActivity_exit).withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
-        final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).
-                color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(100);
-        profile_d_item = new ProfileDrawerItem().
-                withName("me").
-                withIcon(d1);
-        // Create the AccountHeader
-        main_drawer_header = new AccountHeaderBuilder().
-                withSelectionListEnabledForSingleProfile(false).
-                withActivity(this).
-                withCompactStyle(true).
-                addProfiles(profile_d_item).
-                withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
-                {
-                    @Override
-                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
-                    {
-                        return false;
-                    }
-                }).build();
-        // create the drawer and remember the `Drawer` result object
-        main_drawer = new DrawerBuilder().
-                withActivity(this).
-                withInnerShadow(false).
-                withRootView(R.id.drawer_container).
-                withShowDrawerOnFirstLaunch(false).
-                withActionBarDrawerToggleAnimated(true).
-                withActionBarDrawerToggle(true).
-                withToolbar(toolbar).
-                addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4, item5, new DividerDrawerItem(),
-                               item6).
-                withTranslucentStatusBar(false).
-                withAccountHeader(main_drawer_header).
-                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
-                {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
-                    {
-                        Log.i(TAG, "drawer:item=" + position);
-
-                        if (position == 1)
-                        {
-                            // profile
-                            try
-                            {
-                                if (Callstate.state == 0)
-                                {
-                                    Log.i(TAG, "start profile activity");
-                                    Intent intent = new Intent(context_s, ProfileActivity.class);
-                                    startActivityForResult(intent, ProfileActivity_ID);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-                        else if (position == 3)
-                        {
-                            // settings
-                            try
-                            {
-                                if (Callstate.state == 0)
-                                {
-                                    Log.i(TAG, "start settings activity");
-                                    Intent intent = new Intent(context_s, SettingsActivity.class);
-                                    startActivityForResult(intent, SettingsActivity_ID);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-                        else if (position == 4)
-                        {
-                            // logout/login
-                            try
-                            {
-                                if (is_tox_started)
-                                {
-                                    global_stop_tox();
-                                }
-                                else
-                                {
-                                    global_start_tox();
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-                        else if (position == 6)
-                        {
-                            // About
-                            try
-                            {
-                                Log.i(TAG, "start aboutpage activity");
-                                Intent intent = new Intent(context_s, Aboutpage.class);
-                                startActivityForResult(intent, AboutpageActivity_ID);
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-                        else if (position == 5)
-                        {
-                            // Maintenance
-                            try
-                            {
-                                Log.i(TAG, "start Maintenance activity");
-                                Intent intent = new Intent(context_s, MaintenanceActivity.class);
-                                startActivityForResult(intent, MaintenanceActivity_ID);
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-
-                            // -- clear Glide cache --
-                            // -- clear Glide cache --
-                            // clearCache();
-                            // -- clear Glide cache --
-                            // -- clear Glide cache --
-                        }
-                        else if (position == 8)
-                        {
-                            // Exit
-                            try
-                            {
-                                GroupAudioService.stop_me();
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-
-                            try
-                            {
-                                if (is_tox_started)
-                                {
-                                    tox_service_fg.stop_tox_fg(true);
-                                    tox_service_fg.stop_me(true);
-                                }
-                                else
-                                {
-                                    // just exit
-                                    tox_service_fg.stop_me(true);
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        return true;
-                    }
-                }).build();
-        //        DrawerLayout drawer_layout = (DrawerLayout) findViewById(R.id.material_drawer_layout);
-        //        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.faw_envelope_open, R.string.faw_envelope_open);
-        //
-        //        drawer_layout.setDrawerListener(drawerToggle);
-        //
-        //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //        getSupportActionBar().setHomeButtonEnabled(true);
-        //        drawerToggle.syncState();
-        // show hambuger icon -------
-        // getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        // main_drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
-        // show back icon -------
-        // main_drawer.getActionBarDrawerToggle().setDrawerIndicatorEnabled(false);
-        // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        // -------- drawer ------------
-        // -------- drawer ------------
-        // -------- drawer ------------
         // reset calling state
         Callstate.state = 0;
         Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value;
@@ -1405,14 +1029,6 @@ public class MainActivity extends AppCompatActivity
         Callstate.other_video_enabled = 1;
         Callstate.my_audio_enabled = 1;
         Callstate.my_video_enabled = 1;
-
-        String native_api = getNativeLibAPI();
-        mt.setText(mt.getText() + "\n" + native_api);
-        mt.setText(mt.getText() + "\n" + "c-toxcore:v" + tox_version_major() + "." + tox_version_minor() + "." +
-                   tox_version_patch());
-        mt.setText(mt.getText() + ", " + "jni-c-toxcore:v" + jnictoxcore_version());
-        Log.i(TAG, "loaded:c-toxcore:v" + tox_version_major() + "." + tox_version_minor() + "." + tox_version_patch());
-        Log.i(TAG, "loaded:jni-c-toxcore:v" + jnictoxcore_version());
 
         if ((!TOX_SERVICE_STARTED) || (vfs == null))
         {
@@ -1551,23 +1167,6 @@ public class MainActivity extends AppCompatActivity
             tox_thread_start();
         }
 
-        // --- forground service ---
-        // --- forground service ---
-        // --- forground service ---
-        receiverFilter1 = new IntentFilter(AudioManager.ACTION_HEADSET_PLUG);
-        receiver1 = new HeadsetStateReceiver();
-        registerReceiver(receiver1, receiverFilter1);
-        receiverFilter2 = new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
-        receiver2 = new HeadsetStateReceiver();
-        registerReceiver(receiver2, receiverFilter2);
-        // --
-        receiverFilter3 = new IntentFilter(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
-        receiver3 = new HeadsetStateReceiver();
-        registerReceiver(receiver3, receiverFilter3);
-        // --
-        receiverFilter4 = new IntentFilter(BluetoothHeadset.ACTION_AUDIO_STATE_CHANGED);
-        receiver4 = new HeadsetStateReceiver();
-        registerReceiver(receiver4, receiverFilter4);
         // --
         MainActivity.set_av_call_status(Callstate.state);
 
@@ -1629,13 +1228,6 @@ public class MainActivity extends AppCompatActivity
     {
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-    {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // NOTE: delegate the permission handling to generated method
-        MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
-    }
     // ------- for runtime permissions -------
     // ------- for runtime permissions -------
     // ------- for runtime permissions -------
@@ -1756,6 +1348,7 @@ public class MainActivity extends AppCompatActivity
                                 PREF__force_udp_only_to_int = 1;
                             }
 
+                            Log.i("tox_thread_start", this.getClass().getName());
                             init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int,
                                  PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
                                  TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
@@ -1886,6 +1479,7 @@ public class MainActivity extends AppCompatActivity
                     PREF__force_udp_only_to_int = 1;
                 }
 
+                Log.i("global_start_tox", this.getClass().getName());
                 init(app_files_directory, PREF__udp_enabled, PREF__local_discovery_enabled_to_int,
                      PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
                      TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
@@ -1904,465 +1498,23 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onDestroy()
+    public void onDestroy()
     {
         super.onDestroy();
-        try
-        {
-            unregisterReceiver(receiver1);
-        }
-        catch (Exception e)
-        {
-        }
-
-        try
-        {
-            unregisterReceiver(receiver2);
-        }
-        catch (Exception e)
-        {
-        }
-
-        try
-        {
-            unregisterReceiver(receiver3);
-        }
-        catch (Exception e)
-        {
-        }
-
-        try
-        {
-            unregisterReceiver(receiver4);
-        }
-        catch (Exception e)
-        {
-        }
     }
 
+    @Nullable
     @Override
-    protected void onStart()
-    {
-        super.onStart();
-        // just in case, update own activity pointer!
-        main_activity_s = this;
+    public IBinder onBind(Intent intent) {
+        return binder;
     }
 
-    @Override
-    protected void onPause()
-    {
-        Log.i(TAG, "onPause");
-        super.onPause();
-        MainActivity.friend_list_fragment = null;
-    }
-
-    @Override
-    protected void onResume()
-    {
-        Log.i(TAG, "onResume");
-        super.onResume();
-        // prefs ----------
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        PREF__UV_reversed = settings.getBoolean("video_uv_reversed", true);
-        PREF__notification_sound = settings.getBoolean("notifications_new_message_sound", true);
-        PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", true);
-        PREF__notification = settings.getBoolean("notifications_new_message", true);
-        PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
-        PREF__fps_half = settings.getBoolean("fps_half", false);
-        PREF__h264_encoder_use_intra_refresh = settings.getBoolean("h264_encoder_use_intra_refresh", true);
-        PREF__U_keep_nospam = settings.getBoolean("U_keep_nospam", false);
-        PREF__set_fps = settings.getBoolean("set_fps", false);
-        PREF__conference_show_system_messages = settings.getBoolean("conference_show_system_messages", false);
-        PREF__X_battery_saving_mode = settings.getBoolean("X_battery_saving_mode", false);
-        PREF__X_misc_button_enabled = settings.getBoolean("X_misc_button_enabled", false);
-        PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
-        PREF__force_udp_only = settings.getBoolean("force_udp_only", false);
-        PREF__use_incognito_keyboard = settings.getBoolean("use_incognito_keyboard", true);
-        PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
-        PREF__tox_set_do_not_sync_av = settings.getBoolean("X_tox_set_do_not_sync_av", false);
-
-        try
-        {
-            if (settings.getString("X_battery_saving_timeout", "15").compareTo("15") == 0)
-            {
-                PREF__X_battery_saving_timeout = 15;
-            }
-            else
-            {
-                PREF__X_battery_saving_timeout = Integer.parseInt(settings.getString("X_battery_saving_timeout", "15"));
-                Log.i(TAG, "PREF__X_battery_saving_timeout:2:=" + PREF__X_battery_saving_timeout);
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__X_battery_saving_timeout = 15;
-        }
-
-        try
-        {
-            PREF__X_eac_delay_ms = Integer.parseInt(settings.getString("X_eac_delay_ms_2", "80"));
-        }
-        catch (Exception e)
-        {
-            PREF__X_eac_delay_ms = 80;
-            e.printStackTrace();
-        }
-
-        try
-        {
-            PREF__X_audio_play_buffer_custom = Integer.parseInt(settings.getString("X_audio_play_buffer_custom", "0"));
-        }
-        catch (Exception e)
-        {
-            PREF__X_audio_play_buffer_custom = 0;
-            e.printStackTrace();
-        }
-
-
-        try
-        {
-            PREF_mic_gain_factor = (float) (settings.getInt("mic_gain_factor", 1));
-            Log.i(TAG, "PREF_mic_gain_factor:1=" + PREF_mic_gain_factor);
-            PREF_mic_gain_factor = PREF_mic_gain_factor + 1.0f;
-
-            if (PREF_mic_gain_factor < 1.0f)
-            {
-                PREF_mic_gain_factor = 1.0f;
-            }
-            else if (PREF_mic_gain_factor > 30.0f)
-            {
-                PREF_mic_gain_factor = 30.0f;
-            }
-            Log.i(TAG, "PREF_mic_gain_factor:2=" + PREF_mic_gain_factor);
-        }
-        catch (Exception e)
-        {
-            PREF_mic_gain_factor = 2.0f;
-            Log.i(TAG, "PREF_mic_gain_factor:E=" + PREF_mic_gain_factor);
-            e.printStackTrace();
-        }
-
-        if (PREF__U_keep_nospam == true)
-        {
-            top_imageview.setBackgroundColor(Color.TRANSPARENT);
-            // top_imageview.setBackgroundColor(Color.parseColor("#C62828"));
-            final Drawable d1 = new IconicsDrawable(this).
-                    icon(FontAwesome.Icon.faw_exclamation_circle).
-                    paddingDp(20).
-                    color(getResources().getColor(R.color.md_red_600)).
-                    sizeDp(100);
-            top_imageview.setImageDrawable(d1);
-        }
-        else
-        {
-            top_imageview.setBackgroundColor(Color.TRANSPARENT);
-            top_imageview.setImageResource(R.drawable.web_hi_res_512);
-        }
-
-        boolean tmp1 = settings.getBoolean("udp_enabled", false);
-
-        if (tmp1)
-        {
-            PREF__udp_enabled = 1;
-        }
-        else
-        {
-            PREF__udp_enabled = 0;
-        }
-
-        PREF__higher_video_quality = 0;
-        GLOBAL_VIDEO_BITRATE = LOWER_GLOBAL_VIDEO_BITRATE;
-
-        try
-        {
-            PREF__video_call_quality = Integer.parseInt(settings.getString("video_call_quality", "0"));
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__video_call_quality = 0;
-        }
-
-        try
-        {
-            PREF__higher_audio_quality = Integer.parseInt(settings.getString("higher_audio_quality", "1"));
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__higher_audio_quality = 1;
-        }
-
-        if (PREF__higher_audio_quality == 2)
-        {
-            GLOBAL_AUDIO_BITRATE = HIGHER_GLOBAL_AUDIO_BITRATE;
-        }
-        else if (PREF__higher_audio_quality == 1)
-        {
-            GLOBAL_AUDIO_BITRATE = NORMAL_GLOBAL_AUDIO_BITRATE;
-        }
-        else
-        {
-            GLOBAL_AUDIO_BITRATE = LOWER_GLOBAL_AUDIO_BITRATE;
-        }
-
-        try
-        {
-            if (settings.getString("min_audio_samplingrate_out", "8000").compareTo("Auto") == 0)
-            {
-                PREF__min_audio_samplingrate_out = 8000;
-            }
-            else
-            {
-                PREF__min_audio_samplingrate_out = Integer.parseInt(
-                        settings.getString("min_audio_samplingrate_out", "" + MIN_AUDIO_SAMPLINGRATE_OUT));
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__min_audio_samplingrate_out = MIN_AUDIO_SAMPLINGRATE_OUT;
-        }
-
-        // ------- FIXED -------
-        PREF__min_audio_samplingrate_out = SAMPLE_RATE_FIXED;
-        // ------- FIXED -------
-
-
-        Log.i(TAG, "PREF__UV_reversed:2=" + PREF__UV_reversed);
-        Log.i(TAG, "PREF__min_audio_samplingrate_out:2=" + PREF__min_audio_samplingrate_out);
-
-        try
-        {
-            PREF__allow_screen_off_in_audio_call = settings.getBoolean("allow_screen_off_in_audio_call", true);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__allow_screen_off_in_audio_call = true;
-        }
-
-        try
-        {
-            PREF__auto_accept_image = settings.getBoolean("auto_accept_image", true);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__auto_accept_image = true;
-        }
-
-        try
-        {
-            PREF__auto_accept_video = settings.getBoolean("auto_accept_video", false);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__auto_accept_video = false;
-        }
-
-        try
-        {
-            PREF__auto_accept_all_upto = settings.getBoolean("auto_accept_all_upto", false);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__auto_accept_all_upto = false;
-        }
-
-        try
-        {
-            PREF__X_zoom_incoming_video = settings.getBoolean("X_zoom_incoming_video", false);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__X_zoom_incoming_video = false;
-        }
-
-        try
-        {
-            PREF__X_audio_recording_frame_size = Integer.parseInt(
-                    settings.getString("X_audio_recording_frame_size", "" + 40));
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__X_audio_recording_frame_size = 40;
-        }
-
-        // ------- FIXED -------
-        PREF__X_audio_recording_frame_size = FRAME_SIZE_FIXED;
-        // ------- FIXED -------
-
-        try
-        {
-            PREF__video_cam_resolution = Integer.parseInt(settings.getString("video_cam_resolution", "" + 0));
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__video_cam_resolution = 0;
-        }
-
-        try
-        {
-            PREF__global_font_size = Integer.parseInt(settings.getString("global_font_size", "" + 2));
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__global_font_size = 2;
-        }
-
-        PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
-
-        // prefs ----------
-
-        try
-        {
-            profile_d_item.withIcon(
-                    HelperGeneric.get_drawable_from_vfs_image(HelperGeneric.get_vfs_image_filename_own_avatar()));
-            main_drawer_header.updateProfile(profile_d_item);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "onResume:EE1:" + e.getMessage());
-
-            try
-            {
-                final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(
-                        getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
-                profile_d_item.withIcon(d1);
-                main_drawer_header.updateProfile(profile_d_item);
-            }
-            catch (Exception e2)
-            {
-                Log.i(TAG, "onResume:EE2:" + e2.getMessage());
-                e2.printStackTrace();
-            }
-        }
-
-        spinner_own_status.setSelection(global_tox_self_status);
-        // just in case, update own activity pointer!
-        main_activity_s = this;
-
-        try
-        {
-            // ask user to whitelist app from DozeMode/BatteryOptimizations
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            {
-                SharedPreferences settings2 = PreferenceManager.getDefaultSharedPreferences(this);
-                boolean asked_for_whitelist_doze_already = settings2.getBoolean("asked_whitelist_doze", false);
-
-                if (!asked_for_whitelist_doze_already)
-                {
-                    settings2.edit().putBoolean("asked_whitelist_doze", true).commit();
-                    final Intent intent = new Intent();
-                    intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-                    ResolveInfo resolve_activity = getPackageManager().resolveActivity(intent, 0);
-
-                    if (resolve_activity != null)
-                    {
-                        AlertDialog ad = new AlertDialog.Builder(this).
-                                setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
-                                {
-                                    public void onClick(DialogInterface dialog, int id)
-                                    {
-                                        return;
-                                    }
-                                }).
-                                setPositiveButton(R.string.MainActivity_ok_take_me_there_button,
-                                                  new DialogInterface.OnClickListener()
-                                                  {
-                                                      public void onClick(DialogInterface dialog, int id)
-                                                      {
-                                                          startActivity(intent);
-                                                      }
-                                                  }).create();
-                        ad.setTitle(getString(R.string.MainActivity_info_dialog_title));
-                        ad.setMessage(getString(R.string.MainActivity_add_to_batt_opt));
-                        ad.setCancelable(false);
-                        ad.setCanceledOnTouchOutside(false);
-                        ad.show();
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        // ACK new Notification token --------------------------
-        if (get_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK) != null)
-        {
-            // ok we have a new token, show the user a dialog to ask if we should use it
-            AlertDialog ad = new AlertDialog.Builder(this).
-                    setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int id)
-                        {
-                            try
-                            {
-                                del_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                                Log.i(TAG, "del_NOTIFICATION_TOKEN_DB_KEY_NEED_ACK:EE01:" + e.getMessage());
-                            }
-                        }
-                    }).
-                    setPositiveButton(R.string.MainActivity_yes_button, new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int id)
-                        {
-                            try
-                            {
-                                String new_token = get_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
-                                set_g_opts(NOTIFICATION_TOKEN_DB_KEY, new_token);
-                                del_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                                Log.i(TAG, "update_NOTIFICATION_TOKEN_DB_KEY_NEED_ACK:EE01:" + e.getMessage());
-                            }
-                        }
-                    }).create();
-            ad.setTitle(getString(R.string.MainActivity_new_noti_token_dialog_title));
-            ad.setMessage(getString(R.string.MainActivity_new_noti_token_dialog_text));
-            ad.setCancelable(false);
-            ad.setCanceledOnTouchOutside(false);
-            ad.show();
-        }
-        // ACK new Notification token --------------------------
-    }
-
-    @Override
-    protected void onNewIntent(Intent i)
-    {
-        Log.i(TAG, "onNewIntent:i=" + i);
-        super.onNewIntent(i);
-    }
-
-    @Override
-    public void onBackPressed()
-    {
-        if (main_drawer.isDrawerOpen())
-        {
-            main_drawer.closeDrawer();
-        }
-        else
-        {
-            super.onBackPressed();
+    public class LocalBinder extends Binder {
+        public MainActivity getService() {
+            return MainActivity.this;
         }
     }
+
 
     // -- this is for incoming video --
     // -- this is for incoming video --
@@ -2464,7 +1616,7 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     public native void init(@NonNull String data_dir, int udp_enabled, int local_discovery_enabled, int orbot_enabled, String orbot_host, long orbot_port, String tox_encrypt_passphrase_hash, int enable_ipv6, int force_udp_only_mode);
 
-    public native String getNativeLibAPI();
+    public static native String getNativeLibAPI();
 
     public static native String getNativeLibGITHASH();
 
@@ -2812,7 +1964,9 @@ public class MainActivity extends AppCompatActivity
                         Callstate.other_audio_enabled = f_audio_enabled;
                         Callstate.other_video_enabled = f_video_enabled;
                         Callstate.call_init_timestamp = System.currentTimeMillis();
-                        main_activity_s.startActivityForResult(intent, CallingActivity_ID);
+                        if(main_activity_s != null) {
+                            main_activity_s.startActivityForResult(intent, CallingActivity_ID);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -3982,7 +3136,7 @@ public class MainActivity extends AppCompatActivity
                             {
                                 if (typing == 1)
                                 {
-                                    ml_friend_typing.setText(R.string.MainActivity_friend_is_typing);
+                                    ml_friend_typing.setText(R.string.MyMainActivity_friend_is_typing);
                                 }
                                 else
                                 {
@@ -6037,128 +5191,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void show_add_friend(View view)
-    {
-        Intent intent = new Intent(this, AddFriendActivity.class);
-        // intent.putExtra("key", value);
-        startActivityForResult(intent, AddFriendActivity_ID);
-    }
-
     public void show_wrong_credentials()
     {
         Intent intent = new Intent(this, WrongCredentials.class);
         startActivity(intent);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == AddFriendActivity_ID)
-        {
-            if (resultCode == RESULT_OK)
-            {
-                String friend_tox_id1 = data.getStringExtra("toxid");
-                String friend_tox_id = "";
-                friend_tox_id = friend_tox_id1.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst(
-                        "TOX:", "").replaceFirst("Tox:", "");
-                HelperFriend.add_friend_real(friend_tox_id);
-            }
-            else
-            {
-                // (resultCode == RESULT_CANCELED)
-            }
-        }
-    }
-
-
-    void sendEmailWithAttachment(Context c, final String recipient, final String subject, final String message, final String full_file_name, final String full_file_name_suppl)
-    {
-        try
-        {
-            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", recipient, null));
-            emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
-            ArrayList<Uri> uris = new ArrayList<>();
-            uris.add(Uri.parse("file://" + full_file_name));
-            Log.i(TAG, "email:full_file_name=" + full_file_name);
-            File ff = new File(full_file_name);
-            Log.i(TAG, "email:full_file_name exists:" + ff.exists());
-
-            try
-            {
-                if (new File(full_file_name_suppl).length() > 0)
-                {
-                    uris.add(Uri.parse("file://" + full_file_name_suppl));
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                Log.i(TAG, "email:EE1:" + e.getMessage());
-            }
-
-            List<ResolveInfo> resolveInfos = getPackageManager().queryIntentActivities(emailIntent, 0);
-            List<LabeledIntent> intents = new ArrayList<>();
-
-            if (resolveInfos.size() != 0)
-            {
-                for (ResolveInfo info : resolveInfos)
-                {
-                    Intent intent = new Intent(Intent.ACTION_SEND_MULTIPLE);
-                    Log.i(TAG, "email:" + "comp=" + info.activityInfo.packageName + " " + info.activityInfo.name);
-                    intent.setComponent(new ComponentName(info.activityInfo.packageName, info.activityInfo.name));
-                    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{recipient});
-
-                    if (subject != null)
-                    {
-                        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-                    }
-
-                    if (message != null)
-                    {
-                        intent.putExtra(Intent.EXTRA_TEXT, message);
-                        // ArrayList<String> extra_text = new ArrayList<String>();
-                        // extra_text.add(message);
-                        // intent.putStringArrayListExtra(android.content.Intent.EXTRA_TEXT, extra_text);
-                        // Log.i(TAG, "email:" + "message=" + message);
-                        // Log.i(TAG, "email:" + "intent extra_text=" + extra_text);
-                    }
-
-                    intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
-                    intents.add(new LabeledIntent(intent, info.activityInfo.packageName,
-                                                  info.loadLabel(getPackageManager()), info.icon));
-                }
-
-                try
-                {
-                    Intent chooser = Intent.createChooser(intents.remove(intents.size() - 1),
-                                                          "Send email with attachments");
-                    chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, intents.toArray(new LabeledIntent[intents.size()]));
-                    startActivity(chooser);
-                }
-                catch (Exception email_app)
-                {
-                    email_app.printStackTrace();
-                    Log.i(TAG, "email:" + "Error starting Email App");
-                    new AlertDialog.Builder(c).setMessage(
-                            R.string.MainActivity_error_starting_email_app).setPositiveButton(
-                            R.string.MainActivity_button_ok, null).show();
-                }
-            }
-            else
-            {
-                Log.i(TAG, "email:" + "No Email App found");
-                new AlertDialog.Builder(c).setMessage(R.string.MainActivity_no_email_app_found).setPositiveButton(
-                        R.string.MainActivity_button_ok, null).show();
-            }
-        }
-        catch (ActivityNotFoundException e)
-        {
-            // cannot send email for some reason
-            e.printStackTrace();
-            Log.i(TAG, "email:EE2:" + e.getMessage());
-        }
     }
 
     static String safe_string_XX(byte[] in)
@@ -6206,451 +5242,6 @@ public class MainActivity extends AppCompatActivity
 
     final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
-    static class delete_selected_messages_asynchtask extends AsyncTask<Void, Void, String>
-    {
-        ProgressDialog progressDialog2;
-        private WeakReference<Context> weakContext;
-        boolean update_message_list = false;
-        boolean update_friend_list = false;
-        String dialog_text = "";
-
-        delete_selected_messages_asynchtask(Context c, ProgressDialog progressDialog2, boolean update_message_list, boolean update_friend_list, String dialog_text)
-        {
-            this.weakContext = new WeakReference<>(c);
-            this.progressDialog2 = progressDialog2;
-            this.update_message_list = update_message_list;
-            this.update_friend_list = update_friend_list;
-            this.dialog_text = dialog_text;
-        }
-
-        @Override
-        protected String doInBackground(Void... voids)
-        {
-            // sort ascending (lowest ID on top)
-            Collections.sort(selected_messages, new Comparator<Long>()
-            {
-                public int compare(Long o1, Long o2)
-                {
-                    return o1.compareTo(o2);
-                }
-            });
-            Iterator i = selected_messages.iterator();
-
-            while (i.hasNext())
-            {
-                try
-                {
-                    long mid = (Long) i.next();
-                    final Message m_to_delete = orma.selectFromMessage().idEq(mid).get(0);
-
-                    // ---------- delete fileDB if this message is an outgoing file ----------
-                    if (m_to_delete.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
-                    {
-                        if (m_to_delete.direction == 1)
-                        {
-                            try
-                            {
-                                // FileDB file_ = orma.selectFromFileDB().idEq(m_to_delete.filedb_id).get(0);
-                                orma.deleteFromFileDB().idEq(m_to_delete.filedb_id).execute();
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                                Log.i(TAG, "delete_selected_messages_asynchtask:EE4:" + e.getMessage());
-                            }
-                        }
-                    }
-
-                    // ---------- delete fileDB if this message is an outgoing file ----------
-
-                    // ---------- delete fileDB and VFS file if this message is an incoming file ----------
-                    if (m_to_delete.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
-                    {
-                        if (m_to_delete.direction == 0)
-                        {
-                            try
-                            {
-                                FileDB file_ = orma.selectFromFileDB().idEq(m_to_delete.filedb_id).get(0);
-
-                                try
-                                {
-                                    info.guardianproject.iocipher.File f_vfs = new info.guardianproject.iocipher.File(
-                                            file_.path_name + "/" + file_.file_name);
-
-                                    if (f_vfs.exists())
-                                    {
-                                        f_vfs.delete();
-                                    }
-                                }
-                                catch (Exception e6)
-                                {
-                                    e6.printStackTrace();
-                                    Log.i(TAG, "delete_selected_messages_asynchtask:EE5:" + e6.getMessage());
-                                }
-
-                                orma.deleteFromFileDB().idEq(m_to_delete.filedb_id).execute();
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                                Log.i(TAG, "delete_selected_messages_asynchtask:EE4:" + e.getMessage());
-                            }
-                        }
-                    }
-
-                    // ---------- delete fileDB and VFS file if this message is an incoming file ----------
-
-                    // ---------- delete the message itself ----------
-                    try
-                    {
-                        long message_id_to_delete = m_to_delete.id;
-
-                        try
-                        {
-                            if (update_message_list)
-                            {
-                                Runnable myRunnable = new Runnable()
-                                {
-                                    @Override
-                                    public void run()
-                                    {
-                                        try
-                                        {
-                                            MainActivity.message_list_fragment.adapter.remove_item(m_to_delete);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                };
-
-                                if (main_handler_s != null)
-                                {
-                                    main_handler_s.post(myRunnable);
-                                }
-                            }
-
-                            // let message delete animation finish (maybe use yet another asynctask here?) ------------
-                            try
-                            {
-                                if (update_message_list)
-                                {
-                                    Thread.sleep(50);
-                                }
-                            }
-                            catch (Exception sleep_ex)
-                            {
-                                sleep_ex.printStackTrace();
-                            }
-
-                            // let message delete animation finish (maybe use yet another asynctask here?) ------------
-                            orma.deleteFromMessage().idEq(message_id_to_delete).execute();
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                            Log.i(TAG, "delete_selected_messages_asynchtask:EE1:" + e.getMessage());
-                        }
-                    }
-                    catch (Exception e2)
-                    {
-                        e2.printStackTrace();
-                        Log.i(TAG, "delete_selected_messages_asynchtask:EE2:" + e2.getMessage());
-                    }
-
-                    // ---------- delete the message itself ----------
-                }
-                catch (Exception e2)
-                {
-                    e2.printStackTrace();
-                    Log.i(TAG, "delete_selected_messages_asynchtask:EE3:" + e2.getMessage());
-                }
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result)
-        {
-            selected_messages.clear();
-            selected_messages_incoming_file.clear();
-            selected_messages_text_only.clear();
-
-            try
-            {
-                progressDialog2.dismiss();
-                Context c = weakContext.get();
-                Toast.makeText(c, R.string.MainActivity_toast_msg_deleted, Toast.LENGTH_SHORT).show();
-            }
-            catch (Exception e4)
-            {
-                e4.printStackTrace();
-                Log.i(TAG, "save_selected_messages_asynchtask:EE3:" + e4.getMessage());
-            }
-        }
-
-        @Override
-        protected void onPreExecute()
-        {
-            super.onPreExecute();
-
-            if (this.progressDialog2 == null)
-            {
-                try
-                {
-                    Context c = weakContext.get();
-                    progressDialog2 = ProgressDialog.show(c, "", dialog_text);
-                    progressDialog2.setCanceledOnTouchOutside(false);
-                    progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
-                    {
-                        @Override
-                        public void onCancel(DialogInterface dialog)
-                        {
-                        }
-                    });
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "onPreExecute:start:EE:" + e.getMessage());
-                }
-            }
-        }
-    }
-
-    static class save_selected_messages_asynchtask extends AsyncTask<Void, Void, String>
-    {
-        ProgressDialog progressDialog2;
-        private WeakReference<Context> weakContext;
-        private String export_directory = "";
-
-        save_selected_messages_asynchtask(Context c, ProgressDialog progressDialog2)
-        {
-            this.weakContext = new WeakReference<>(c);
-            this.progressDialog2 = progressDialog2;
-        }
-
-        @Override
-        protected String doInBackground(Void... voids)
-        {
-            Iterator i = selected_messages_incoming_file.iterator();
-
-            while (i.hasNext())
-            {
-                try
-                {
-                    long mid = (Long) i.next();
-                    Message m = orma.selectFromMessage().idEq(mid).get(0);
-                    FileDB file_ = orma.selectFromFileDB().idEq(m.filedb_id).get(0);
-                    HelperGeneric.export_vfs_file_to_real_file(file_.path_name, file_.file_name,
-                                                               SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey +
-                                                               "/", file_.file_name);
-
-                    export_directory = SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey + "/";
-                }
-                catch (Exception e2)
-                {
-                    e2.printStackTrace();
-                    Log.i(TAG, "save_selected_messages_asynchtask:EE1:" + e2.getMessage());
-                }
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result)
-        {
-            selected_messages.clear();
-            selected_messages_incoming_file.clear();
-            selected_messages_text_only.clear();
-
-            try
-            {
-                // need to redraw all items again here, to remove the selections
-                MainActivity.message_list_fragment.adapter.redraw_all_items();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                Log.i(TAG, "save_selected_messages_asynchtask:EE2:" + e.getMessage());
-            }
-
-            try
-            {
-                progressDialog2.dismiss();
-                Context c = weakContext.get();
-                Toast.makeText(c, "Files exported to:" + "\n" + export_directory, Toast.LENGTH_SHORT).show();
-            }
-            catch (Exception e4)
-            {
-                e4.printStackTrace();
-                Log.i(TAG, "save_selected_messages_asynchtask:EE3:" + e4.getMessage());
-            }
-        }
-
-        @Override
-        protected void onPreExecute()
-        {
-        }
-    }
-
-    static class delete_selected_conference_messages_asynchtask extends AsyncTask<Void, Void, String>
-    {
-        ProgressDialog progressDialog2;
-        private WeakReference<Context> weakContext;
-        boolean update_conf_message_list = false;
-        String dialog_text = "";
-
-        delete_selected_conference_messages_asynchtask(Context c, ProgressDialog progressDialog2, boolean update_conf_message_list, String dialog_text)
-        {
-            this.weakContext = new WeakReference<>(c);
-            this.progressDialog2 = progressDialog2;
-            this.update_conf_message_list = update_conf_message_list;
-            this.dialog_text = dialog_text;
-        }
-
-        @Override
-        protected String doInBackground(Void... voids)
-        {
-            // sort ascending (lowest ID on top)
-            Collections.sort(selected_conference_messages, new Comparator<Long>()
-            {
-                public int compare(Long o1, Long o2)
-                {
-                    return o1.compareTo(o2);
-                }
-            });
-            Iterator i = selected_conference_messages.iterator();
-
-            while (i.hasNext())
-            {
-                try
-                {
-                    long mid = (Long) i.next();
-                    final ConferenceMessage m_to_delete = orma.selectFromConferenceMessage().idEq(mid).get(0);
-
-                    // ---------- delete the message itself ----------
-                    try
-                    {
-                        long message_id_to_delete = m_to_delete.id;
-
-                        try
-                        {
-                            if (update_conf_message_list)
-                            {
-                                Runnable myRunnable = new Runnable()
-                                {
-                                    @Override
-                                    public void run()
-                                    {
-                                        try
-                                        {
-                                            MainActivity.conference_message_list_fragment.adapter.remove_item(
-                                                    m_to_delete);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                };
-
-                                if (main_handler_s != null)
-                                {
-                                    main_handler_s.post(myRunnable);
-                                }
-                            }
-
-                            // let message delete animation finish (maybe use yet another asynctask here?) ------------
-                            try
-                            {
-                                if (update_conf_message_list)
-                                {
-                                    Thread.sleep(50);
-                                }
-                            }
-                            catch (Exception sleep_ex)
-                            {
-                                sleep_ex.printStackTrace();
-                            }
-
-                            // let message delete animation finish (maybe use yet another asynctask here?) ------------
-                            orma.deleteFromConferenceMessage().idEq(message_id_to_delete).execute();
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                            Log.i(TAG, "delete_selected_conference_messages_asynchtask:EE1:" + e.getMessage());
-                        }
-                    }
-                    catch (Exception e2)
-                    {
-                        e2.printStackTrace();
-                        Log.i(TAG, "delete_selected_conference_messages_asynchtask:EE2:" + e2.getMessage());
-                    }
-
-                    // ---------- delete the message itself ----------
-                }
-                catch (Exception e2)
-                {
-                    e2.printStackTrace();
-                    Log.i(TAG, "delete_selected_conference_messages_asynchtask:EE3:" + e2.getMessage());
-                }
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result)
-        {
-            selected_conference_messages.clear();
-
-            try
-            {
-                progressDialog2.dismiss();
-                Context c = weakContext.get();
-                Toast.makeText(c, R.string.MainActivity_toast_msgs_deleted, Toast.LENGTH_SHORT).show();
-            }
-            catch (Exception e4)
-            {
-                e4.printStackTrace();
-                Log.i(TAG, "delete_selected_conference_messages_asynchtask:EE3:" + e4.getMessage());
-            }
-        }
-
-        @Override
-        protected void onPreExecute()
-        {
-            super.onPreExecute();
-
-            if (this.progressDialog2 == null)
-            {
-                try
-                {
-                    Context c = weakContext.get();
-                    progressDialog2 = ProgressDialog.show(c, "", dialog_text);
-                    progressDialog2.setCanceledOnTouchOutside(false);
-                    progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
-                    {
-                        @Override
-                        public void onCancel(DialogInterface dialog)
-                        {
-                        }
-                    });
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "onPreExecute:start:EE:" + e.getMessage());
-                }
-            }
-        }
-    }
-
     static class send_message_result
     {
         long msg_num;
@@ -6660,55 +5251,6 @@ public class MainActivity extends AppCompatActivity
         long error_num;
     }
 
-    /*************************************************************************/
-    /* this function now really sends a 1:1 to a friend (or a friends relay) */
-    private void fadeInAndShowImage(final View img, long start_after_millis)
-    {
-        Animation fadeIn = new AlphaAnimation(0, 1);
-        fadeIn.setInterpolator(new AccelerateInterpolator());
-        fadeIn.setDuration(1000);
-        fadeIn.setStartOffset(start_after_millis);
-        fadeIn.setAnimationListener(new Animation.AnimationListener()
-        {
-            public void onAnimationEnd(Animation animation)
-            {
-            }
-
-            public void onAnimationRepeat(Animation animation)
-            {
-            }
-
-            public void onAnimationStart(Animation animation)
-            {
-                img.setVisibility(View.VISIBLE);
-            }
-        });
-        img.startAnimation(fadeIn);
-    }
-
-    private void fadeOutAndHideImage(final View img, long start_after_millis)
-    {
-        Animation fadeOut = new AlphaAnimation(1, 0);
-        fadeOut.setInterpolator(new AccelerateInterpolator());
-        fadeOut.setDuration(1000);
-        fadeOut.setStartOffset(start_after_millis);
-        fadeOut.setAnimationListener(new Animation.AnimationListener()
-        {
-            public void onAnimationEnd(Animation animation)
-            {
-                img.setVisibility(View.GONE);
-            }
-
-            public void onAnimationRepeat(Animation animation)
-            {
-            }
-
-            public void onAnimationStart(Animation animation)
-            {
-            }
-        });
-        img.startAnimation(fadeOut);
-    }
 
     // --------- make app crash ---------
     // --------- make app crash ---------

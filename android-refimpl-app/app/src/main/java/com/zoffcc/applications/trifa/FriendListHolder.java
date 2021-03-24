@@ -791,89 +791,66 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             public boolean onMenuItemClick(MenuItem item)
             {
                 int id = item.getItemId();
-                switch (id)
-                {
-                    case R.id.item_info:
-                        // show friend info page -----------------
-                        long friend_num_temp_safety = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
+                if (id == R.id.item_info) {// show friend info page -----------------
+                    long friend_num_temp_safety = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
 
-                        Log.i(TAG, "onMenuItemClick:info:1:fn_safety=" + friend_num_temp_safety);
+                    Log.i(TAG, "onMenuItemClick:info:1:fn_safety=" + friend_num_temp_safety);
 
-                        Intent intent = new Intent(v.getContext(), FriendInfoActivity.class);
-                        intent.putExtra("friendnum", friend_num_temp_safety);
-                        v.getContext().startActivity(intent);
-                        // show friend info page -----------------
-                        break;
+                    Intent intent = new Intent(v.getContext(), FriendInfoActivity.class);
+                    intent.putExtra("friendnum", friend_num_temp_safety);
+                    v.getContext().startActivity(intent);
+                    // show friend info page -----------------
+                } else if (id == R.id.item_create_conference) {
+                    int res_conf_new = tox_conference_new();
+                    if (res_conf_new >= 0) {
+                        cache_confid_confnum.clear();
 
-                    case R.id.item_create_conference:
-                        int res_conf_new = tox_conference_new();
-                        if (res_conf_new >= 0)
-                        {
-                            cache_confid_confnum.clear();
-
-                            // conference was created, now invite the selected friend
-                            long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
-                            if (friend_num_temp_safety2 > 0)
-                            {
-                                int res_conf_invite = tox_conference_invite(friend_num_temp_safety2, res_conf_new);
-                                if (res_conf_invite < 1)
-                                {
-                                    Log.d(TAG, "onMenuItemClick:info:tox_conference_invite:ERR:" + res_conf_invite);
+                        // conference was created, now invite the selected friend
+                        long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
+                        if (friend_num_temp_safety2 > 0) {
+                            int res_conf_invite = tox_conference_invite(friend_num_temp_safety2, res_conf_new);
+                            if (res_conf_invite < 1) {
+                                Log.d(TAG, "onMenuItemClick:info:tox_conference_invite:ERR:" + res_conf_invite);
+                            } else {
+                                // invite also my ToxProxy -------------
+                                if (have_own_relay()) {
+                                    tox_conference_invite(tox_friend_by_public_key__wrapper(get_own_relay_pubkey()),
+                                            res_conf_new);
                                 }
-                                else
-                                {
-                                    // invite also my ToxProxy -------------
-                                    if (have_own_relay())
-                                    {
-                                        tox_conference_invite(tox_friend_by_public_key__wrapper(get_own_relay_pubkey()),
-                                                              res_conf_new);
-                                    }
-                                    // invite also my ToxProxy -------------
-                                    add_conference_wrapper(friend_num_temp_safety2, res_conf_new, "",
-                                                           TOX_CONFERENCE_TYPE_TEXT.value, false);
-                                    HelperGeneric.update_savedata_file_wrapper();
-                                }
+                                // invite also my ToxProxy -------------
+                                add_conference_wrapper(friend_num_temp_safety2, res_conf_new, "",
+                                        TOX_CONFERENCE_TYPE_TEXT.value, false);
+                                update_savedata_file_wrapper();
                             }
                         }
-                        break;
-                    case R.id.item_create_av_conference:
-                        long res_conf_av_new = toxav_add_av_groupchat();
-                        if (res_conf_av_new >= 0)
-                        {
-                            update_savedata_file_wrapper();
-                            // conference was created, now invite the selected friend
-                            long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
-                            if (friend_num_temp_safety2 > 0)
-                            {
-                                int res_conf_invite = tox_conference_invite(friend_num_temp_safety2, res_conf_av_new);
-                                if (res_conf_invite < 1)
-                                {
-                                    Log.d(TAG, "onMenuItemClick:info:AV:tox_conference_invite:ERR:" + res_conf_invite);
-                                }
-                                else
-                                {
-                                    update_savedata_file_wrapper();
-                                    add_conference_wrapper(friend_num_temp_safety2, res_conf_av_new, "",
-                                                           TOX_CONFERENCE_TYPE_AV.value, false);
-                                    HelperGeneric.update_savedata_file_wrapper();
-                                }
+                    }
+                } else if (id == R.id.item_create_av_conference) {
+                    long res_conf_av_new = toxav_add_av_groupchat();
+                    if (res_conf_av_new >= 0) {
+                        update_savedata_file_wrapper();
+                        // conference was created, now invite the selected friend
+                        long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
+                        if (friend_num_temp_safety2 > 0) {
+                            int res_conf_invite = tox_conference_invite(friend_num_temp_safety2, res_conf_av_new);
+                            if (res_conf_invite < 1) {
+                                Log.d(TAG, "onMenuItemClick:info:AV:tox_conference_invite:ERR:" + res_conf_invite);
+                            } else {
+                                update_savedata_file_wrapper();
+                                add_conference_wrapper(friend_num_temp_safety2, res_conf_av_new, "",
+                                        TOX_CONFERENCE_TYPE_AV.value, false);
+                                update_savedata_file_wrapper();
                             }
                         }
-                        break;
-                    case R.id.item_add_toxproxy:
-                        if (!have_own_relay())
-                        {
-                            show_confirm_addrelay_dialog(v, f2);
-                            // add as ToxProxy relay -----------------
-                        }
-                        break;
-                    case R.id.item_dummy01:
-                        break;
-                    case R.id.item_delete:
-                        // delete friend -----------------
-                        show_confirm_dialog(v, f2);
-                        // delete friend -----------------
-                        break;
+                    }
+                } else if (id == R.id.item_add_toxproxy) {
+                    if (!have_own_relay()) {
+                        show_confirm_addrelay_dialog(v, f2);
+                        // add as ToxProxy relay -----------------
+                    }
+                } else if (id == R.id.item_dummy01) {
+                } else if (id == R.id.item_delete) {// delete friend -----------------
+                    show_confirm_dialog(v, f2);
+                    // delete friend -----------------
                 }
                 return true;
             }

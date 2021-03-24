@@ -329,119 +329,91 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             public boolean onMenuItemClick(MenuItem item)
             {
                 int id = item.getItemId();
-                switch (id)
-                {
-                    //                    case R.id.item_info:
-                    //                        // show conference info page -----------------
-                    //                        long friend_num_temp_safety = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
-                    //
-                    //                        Log.i(TAG, "onMenuItemClick:info:1:fn_safety=" + friend_num_temp_safety);
-                    //
-                    //                        Intent intent = new Intent(v.getContext(), FriendInfoActivity.class);
-                    //                        intent.putExtra("friendnum", friend_num_temp_safety);
-                    //                        v.getContext().startActivity(intent);
-                    //                        // show conference info page -----------------
-                    //                        break;
-                    case R.id.item_leave:
-                        // leave conference -----------------
-                        if ((f2.tox_conference_number > -1) && (f2.conference_active))
-                        {
-                            tox_conference_delete(f2.tox_conference_number);
-                            cache_confid_confnum.clear();
-                            update_savedata_file_wrapper(); // after deleteing a conference
-                        }
+                //                    case R.id.item_info:
+                //                        // show conference info page -----------------
+                //                        long friend_num_temp_safety = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
+                //
+                //                        Log.i(TAG, "onMenuItemClick:info:1:fn_safety=" + friend_num_temp_safety);
+                //
+                //                        Intent intent = new Intent(v.getContext(), FriendInfoActivity.class);
+                //                        intent.putExtra("friendnum", friend_num_temp_safety);
+                //                        v.getContext().startActivity(intent);
+                //                        // show conference info page -----------------
+                //                        break;
+                if (id == R.id.item_leave) {// leave conference -----------------
+                    if ((f2.tox_conference_number > -1) && (f2.conference_active)) {
+                        tox_conference_delete(f2.tox_conference_number);
+                        cache_confid_confnum.clear();
+                        update_savedata_file_wrapper(); // after deleteing a conference
+                    }
 
-                        set_conference_inactive(f2.conference_identifier);
+                    set_conference_inactive(f2.conference_identifier);
 
-                        Runnable myRunnable = new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                try
-                                {
-                                    try
-                                    {
-                                        if (MainActivity.friend_list_fragment != null)
-                                        {
-                                            // reload friendlist
-                                            // TODO: only remove 1 item, don't clear all!! this can crash
-                                            MainActivity.friend_list_fragment.add_all_friends_clear(200);
-                                        }
+                    Runnable myRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                try {
+                                    if (MyMainActivity.friend_list_fragment != null) {
+                                        // reload friendlist
+                                        // TODO: only remove 1 item, don't clear all!! this can crash
+                                        MyMainActivity.friend_list_fragment.add_all_friends_clear(200);
                                     }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                catch (Exception e)
-                                {
+                                } catch (Exception e) {
                                     e.printStackTrace();
-                                    Log.i(TAG, "onMenuItemClick:8:EE:" + e.getMessage());
                                 }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                Log.i(TAG, "onMenuItemClick:8:EE:" + e.getMessage());
                             }
-                        };
-
-                        // TODO: use own handler
-                        if (main_handler_s != null)
-                        {
-                            main_handler_s.post(myRunnable);
                         }
-                        // leave conference -----------------
-                        break;
-                    case R.id.item_delete:
-                        // delete conference -----------------
+                    };
 
-                        if ((f2.tox_conference_number > -1) && (f2.conference_active))
-                        {
-                            tox_conference_delete(f2.tox_conference_number);
-                            cache_confid_confnum.clear();
-                            update_savedata_file_wrapper(); // after deleteing a conference
-                        }
+                    // TODO: use own handler
+                    if (main_handler_s != null) {
+                        main_handler_s.post(myRunnable);
+                    }
+                    // leave conference -----------------
+                } else if (id == R.id.item_delete) {// delete conference -----------------
 
-                        Log.i(TAG, "onMenuItemClick:info:33");
-                        delete_conference_all_messages(f2.conference_identifier);
-                        delete_conference(f2.conference_identifier);
-                        Log.i(TAG, "onMenuItemClick:info:34");
+                    if ((f2.tox_conference_number > -1) && (f2.conference_active)) {
+                        tox_conference_delete(f2.tox_conference_number);
+                        cache_confid_confnum.clear();
+                        update_savedata_file_wrapper(); // after deleteing a conference
+                    }
 
-                        set_conference_inactive(f2.conference_identifier);
+                    Log.i(TAG, "onMenuItemClick:info:33");
+                    delete_conference_all_messages(f2.conference_identifier);
+                    delete_conference(f2.conference_identifier);
+                    Log.i(TAG, "onMenuItemClick:info:34");
 
-                        Runnable myRunnable2 = new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                try
-                                {
-                                    try
-                                    {
-                                        if (MainActivity.friend_list_fragment != null)
-                                        {
-                                            // reload friendlist
-                                            // TODO: only remove 1 item, don't clear all!! this can crash
-                                            MainActivity.friend_list_fragment.add_all_friends_clear(200);
-                                        }
+                    set_conference_inactive(f2.conference_identifier);
+
+                    Runnable myRunnable2 = new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                try {
+                                    if (MyMainActivity.friend_list_fragment != null) {
+                                        // reload friendlist
+                                        // TODO: only remove 1 item, don't clear all!! this can crash
+                                        MyMainActivity.friend_list_fragment.add_all_friends_clear(200);
                                     }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                catch (Exception e)
-                                {
+                                } catch (Exception e) {
                                     e.printStackTrace();
-                                    Log.i(TAG, "onMenuItemClick:8:EE:" + e.getMessage());
                                 }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                Log.i(TAG, "onMenuItemClick:8:EE:" + e.getMessage());
                             }
-                        };
-
-                        // TODO: use own handler
-                        if (main_handler_s != null)
-                        {
-                            main_handler_s.post(myRunnable2);
                         }
-                        // delete conference -----------------
-                        break;
+                    };
+
+                    // TODO: use own handler
+                    if (main_handler_s != null) {
+                        main_handler_s.post(myRunnable2);
+                    }
+                    // delete conference -----------------
                 }
                 return true;
             }

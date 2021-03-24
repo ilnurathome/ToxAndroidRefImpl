@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_select_all"
+        android:icon="@drawable/ic_baseline_select_all_24"
+        android:title="@string/layout___selectall"
+        app:showAsAction="always"/>
+    <item
         android:id="@+id/action_copy"
         android:icon="@drawable/ic_content_copy_white_24dp"
         android:title="@string/layout___copy"

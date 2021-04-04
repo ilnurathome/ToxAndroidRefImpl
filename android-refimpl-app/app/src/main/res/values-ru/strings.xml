@@ -326,4 +326,5 @@
     <string name="pref_description_auto_accept_all_upto">автоматически принимать все файлы размером до 200 МБ</string>
     <string name="pref_title_auto_accept_all_upto">автоматически принимать все файлы</string>
     <string name="layout___selectall">Выделить всё</string>
+    <string name="layout___clear_messages">Очистить сообщения</string>
 </resources>

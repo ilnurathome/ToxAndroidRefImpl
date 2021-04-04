@@ -619,7 +619,6 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         }
     }
 
-
     public void show_confirm_dialog(final View view, final FriendList f2)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
@@ -690,6 +689,66 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                             {
                                 e.printStackTrace();
                             }
+
+                            Log.i(TAG, "onMenuItemClick:7");
+                            // load all friends into data list ---
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            Log.i(TAG, "onMenuItemClick:8:EE:" + e.getMessage());
+                        }
+                    }
+                };
+                // TODO: use own handler
+                if (view.getHandler() != null)
+                {
+                    view.getHandler().post(myRunnable);
+                }
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    public void show_confirm_clear_dialog(final View view, final FriendList f2)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        builder.setTitle("Clear Friend's messages?");
+        builder.setMessage("Do you want to clear this Friend including all Messages and Files?");
+
+        builder.setNegativeButton("Cancel", null);
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            long friend_num_temp = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
+
+                            Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp);
+
+                            // delete friends files -------
+                            Log.i(TAG, "onMenuItemClick:1.c:fnum=" + friend_num_temp);
+                            delete_friend_all_files(friend_num_temp);
+                            // delete friend  files -------
+
+                            // delete friends FTs -------
+                            Log.i(TAG, "onMenuItemClick:1.d:fnum=" + friend_num_temp);
+                            delete_friend_all_filetransfers(friend_num_temp);
+                            // delete friend  FTs -------
+
+                            // delete friends messages -------
+                            Log.i(TAG, "onMenuItemClick:1.b:fnum=" + friend_num_temp);
+                            delete_friend_all_messages(friend_num_temp);
+                            // delete friend  messages -------
 
                             Log.i(TAG, "onMenuItemClick:7");
                             // load all friends into data list ---
@@ -847,6 +906,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                         show_confirm_addrelay_dialog(v, f2);
                         // add as ToxProxy relay -----------------
                     }
+                } else if (id == R.id.item_clear_messages) {
+                    show_confirm_clear_dialog(v, f2);
                 } else if (id == R.id.item_dummy01) {
                 } else if (id == R.id.item_delete) {// delete friend -----------------
                     show_confirm_dialog(v, f2);

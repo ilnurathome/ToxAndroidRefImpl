@@ -54,6 +54,8 @@ import com.github.gfx.android.orma.encryption.EncryptedDatabase;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.vanniktech.emoji.EmojiManager;
+import com.vanniktech.emoji.ios.IosEmojiProvider;
 import com.yariksoffice.lingver.Lingver;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
@@ -435,6 +437,10 @@ public class MainActivity extends Service
             show_wrong_credentials();
             return;
         }
+
+        Log.i(TAG, "M:STARTUP:EmojiManager install");
+        EmojiManager.install(new IosEmojiProvider());
+        // EmojiManager.install(new EmojiOneProvider());
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         PREF__DB_secrect_key = settings.getString("DB_secrect_key", "");

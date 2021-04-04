@@ -188,6 +188,17 @@ public class MainService extends Service {
                 return res;
             }
         });
+
+        commandMap.put("tox_friend_by_public_key__wrapper", new Command() {
+            @Override
+            public Bundle runCommand(Bundle bundle) {
+                Bundle res = new Bundle();
+                String tox_public_key_string = bundle.getString("tox_public_key_string");
+                Long friendnum = tox_friend_by_public_key__wrapper(tox_public_key_string);
+                res.putLong(MSG_REPLY_FUNC, friendnum);
+                return res;
+            }
+        });
     }
 
 //    private final IBinder binder = new LocalBinder();

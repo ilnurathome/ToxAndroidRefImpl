@@ -187,6 +187,15 @@ public class MainService extends Service {
                 return res;
             }
         });
+
+        commandMap.put("add_friend_real", new Command() {
+            @Override
+            public Bundle runCommand(Bundle bundle) {
+                String friend_tox_id = bundle.getString("friend_tox_id");
+                HelperFriend.add_friend_real(friend_tox_id);
+                return null;
+            }
+        });
     }
 
     static class IncomingHandler extends Handler {

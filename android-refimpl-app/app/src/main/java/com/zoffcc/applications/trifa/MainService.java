@@ -1,7 +1,4 @@
 /**
- * 
- * 
- * <p>
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * version 2 as published by the Free Software Foundation.
@@ -64,15 +61,6 @@ import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 
 // import static com.zoffcc.applications.loggingstdout.LoggingStdout.start_logging;
-
-/*
-
-first actually relayed message via ToxProxy
-
-2019-08-28 22:20:43.286148 [D] friend_message_v2_cb:
-fn=1 res=1 msg=🍔👍😜👍😜 @%\4äö ubnc Ovid n JB von in BK ni ubvzv8 ctcitccccccizzvvcvvv        u  tiigi gig i g35667u 6 66
-
- */
 
 public class MainService extends Service {
     private static final String TAG = "trifa.MainService";
@@ -200,8 +188,6 @@ public class MainService extends Service {
             }
         });
     }
-
-//    private final IBinder binder = new LocalBinder();
 
     static class IncomingHandler extends Handler {
         private MainService mainService;
@@ -356,20 +342,6 @@ public class MainService extends Service {
             objectMapper.findAndRegisterModules();
             objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
-//            orma.selectFromMessageShoppingList().where(orma.relationOfMessageShoppingList().schema.message_id.associationSchema.rcvd_timestamp.getQualifiedName() +">" + timestamp).toList();
-
-//            List<Message> msgs = orma.selectFromMessageShoppingList()
-//                    .where(orma.relationOfMessageShoppingList().schema.message_id.associationSchema.rcvd_timestamp.getQualifiedName() + ">" + timestamp)
-//                    .where(orma.relationOfMessageShoppingList().schema.message_id.associationSchema.direction.getQualifiedName() + "=" + 0)
-//                    .where(orma.relationOfMessageShoppingList().schema.id.getQualifiedName() + " is null")
-//                    .orderBy(orma.relationOfMessageShoppingList().schema.message_id.associationSchema.id.getQualifiedName())
-//                    .getRawValuesAndMap(new Function1<Cursor, Message>() {
-//                        @Override
-//                        public Message apply(Cursor cursor) {
-//                            return orma.selectFromMessage().newModelFromCursor(cursor);
-//                        }
-//                    });
-
             Cursor cursor = orma.getConnection().rawQuery("SELECT `m2`.`message_id`, `m2`.`tox_friendpubkey`, `m2`.`direction`, `m2`.`TOX_MESSAGE_TYPE`, `m2`.`TRIFA_MESSAGE_TYPE`, `m2`.`state`, `m2`.`ft_accepted`, `m2`.`ft_outgoing_started`, `m2`.`filedb_id`, `m2`.`filetransfer_id`, `m2`.`sent_timestamp`, `m2`.`sent_timestamp_ms`, `m2`.`rcvd_timestamp`, `m2`.`rcvd_timestamp_ms`, `m2`.`read`, `m2`.`send_retries`, `m2`.`is_new`, `m2`.`text`, `m2`.`filename_fullpath`, `m2`.`msg_id_hash`, `m2`.`raw_msgv2_bytes`, `m2`.`msg_version`, `m2`.`resend_count`, `m2`.`id` FROM `Message` AS `m2` LEFT OUTER JOIN `MessageShoppingList` AS `m1` ON `m1`.`message_id` = `m2`.`id` WHERE (`m2`.`rcvd_timestamp`>?) AND (`m2`.`direction`=0) AND (`m1`.`id` is null) ORDER BY `m2`.`id`", String.valueOf(timestamp));
                 List<Message> msgs;
                 try {
@@ -383,14 +355,6 @@ public class MainService extends Service {
                     cursor.close();
                 }
 
-
-//            List<MessageShoppingList> msl = orma.selectFromMessageShoppingList().toList();
-//            List<Long> messageIds = new ArrayList<Long>();
-//            for(MessageShoppingList m : msl) {
-//                messageIds.add(m.getMsg_id());
-//            }
-
-//            List<Message> msgs = orma.selectFromMessage().directionEq(0).rcvd_timestampGt(timestamp).idNotIn(messageIds).orderByIdAsc().toList();
             if (msgs.size() > 0) {
                 try {
                     bytes = objectMapper.writeValueAsBytes(msgs);
@@ -499,10 +463,6 @@ public class MainService extends Service {
                     m.id = row_id;
                 }
             }
-//                        }
-//                    }
-//                }
-//            }
         }
     }
 

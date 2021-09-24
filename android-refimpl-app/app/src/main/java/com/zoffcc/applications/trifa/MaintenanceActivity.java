@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,20 +29,22 @@ import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.yariksoffice.lingver.Lingver;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -60,9 +63,15 @@ import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_udp_nodes_into_db;
 import static com.zoffcc.applications.trifa.HelperGeneric.delete_vfs_file;
 import static com.zoffcc.applications.trifa.HelperGeneric.import_toxsave_file_unsecure;
+import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_for_filename;
+import static com.zoffcc.applications.trifa.HelperGeneric.touch;
+import static com.zoffcc.applications.trifa.IOBrowser.getFilesInDir;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
+import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_ENC_CHATS_EXPORT_DIR;
+import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_ENC_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SelectLanguageActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.debug__audio_frame_played;
@@ -78,6 +87,8 @@ import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_facto
 import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_iter;
 import static com.zoffcc.applications.trifa.MainActivity.export_savedata_file_unsecure;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
+import static com.zoffcc.applications.trifa.TrifaSetPatternActivity.filter_out_specials_from_filepath_stricter;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MaintenanceActivity extends AppCompatActivity implements StrongBuilder.Callback<OkHttpClient>
@@ -96,6 +107,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     Button button_test_ringtone;
     Button button_iobrowser_start;
     Button button_export_savedata;
+    Button button_export_encrypted_files;
+    Button button_export_encrypted_chats;
     Button button_import_savedata;
 
     Boolean button_test_ringtone_start = true;
@@ -135,6 +148,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         button_test_ringtone = (Button) findViewById(R.id.button_test_ringtone);
         button_iobrowser_start = (Button) findViewById(R.id.button_iobrowser_start);
         button_export_savedata = (Button) findViewById(R.id.button_export_savedata);
+        button_export_encrypted_files = (Button) findViewById(R.id.button_export_encrypted_files);
+        button_export_encrypted_chats = (Button) findViewById(R.id.button_export_encrypted_chats);
         button_import_savedata = (Button) findViewById(R.id.button_import_savedata);
         text_sqlstats = (TextView) findViewById(R.id.text_sqlstats);
         debug_output = (TextView) findViewById(R.id.debug_output);
@@ -228,7 +243,6 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 }
             }
         });
-
 
         button_sql_analyze.setOnClickListener(new View.OnClickListener()
         {
@@ -353,6 +367,71 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 try
                 {
                     export_savedata_unsecure(this_context);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        button_export_encrypted_files.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this_context);
+                    builder.setTitle("Export Encrypted Files");
+                    builder.setMessage(
+                            "Your Encrypted received files will be exported unencrypted to this location:" + "\n\n" +
+                            MainActivity.SD_CARD_FILES_EXPORT_DIR + SD_CARD_ENC_FILES_EXPORT_DIR);
+
+                    builder.setPositiveButton("Yes, I want to export", new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            export_encrypted_files_unsecure(this_context);
+                            return;
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", null);
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        button_export_encrypted_chats.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this_context);
+                    builder.setTitle("Export Encrypted Chats");
+                    builder.setMessage("Your Encrypted Chats will be exported unencrypted to this location:" + "\n\n" +
+                                       MainActivity.SD_CARD_FILES_EXPORT_DIR + SD_CARD_ENC_CHATS_EXPORT_DIR);
+
+                    builder.setPositiveButton("Yes, I want to export", new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            export_encrypted_chats_unsecure(this_context);
+                            return;
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", null);
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
                 catch (Exception e)
                 {
@@ -652,7 +731,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     Handler maint_handler = new Handler()
     {
         @Override
-        public void handleMessage(Message msg)
+        public void handleMessage(android.os.Message msg)
         {
             super.handleMessage(msg);
             int id = msg.what;
@@ -885,6 +964,289 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         // create and show the alert dialog
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public static void export_encrypted_chats_unsecure(final Context context)
+    {
+        try
+        {
+            new export_enc_chats_async_task(context).execute();
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
+    public static void export_encrypted_files_unsecure(final Context context)
+    {
+        try
+        {
+            new export_enc_files_async_task(context).execute();
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
+    private static class export_enc_chats_async_task extends AsyncTask<Void, Void, Void>
+    {
+        private ProgressDialog dialog;
+        private final Context c;
+
+        public export_enc_chats_async_task(Context c)
+        {
+            this.c = c;
+            dialog = new ProgressDialog(c);
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            dialog.setMessage("exporting ...");
+            dialog.setCancelable(false);
+            dialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... args)
+        {
+            String export_dir_string = MainActivity.SD_CARD_FILES_EXPORT_DIR + SD_CARD_ENC_CHATS_EXPORT_DIR;
+
+            try
+            {
+                File export_dir = new File(export_dir_string);
+                export_dir.mkdirs();
+
+                List<FriendList> fl = orma.selectFromFriendList().
+                        is_relayEq(false).
+                        orderByTox_public_key_stringAsc().
+                        toList();
+                for (FriendList f : fl)
+                {
+                    String dirpath = export_dir_string + "/" + f.tox_public_key_string + "_" +
+                                     filter_out_specials_from_filepath_stricter(f.name);
+                    // Log.i(TAG, "friend:xxx:F:" + dirpath);
+                    new File(dirpath).mkdirs();
+
+                    List<Message> ml = orma.selectFromMessage().
+                            tox_friendpubkeyEq(f.tox_public_key_string).
+                            toList();
+                    for (Message m : ml)
+                    {
+                        long ts = 0;
+                        String msg_type_state = "";
+                        if (m.direction == 0)
+                        {
+                            // incoming msg
+                            ts = m.rcvd_timestamp;
+                            msg_type_state = "I_";
+                        }
+                        else
+                        {
+                            // outgoing msg
+                            ts = m.sent_timestamp;
+                            if (m.read)
+                            {
+                                msg_type_state = "OR";
+                            }
+                            else
+                            {
+                                msg_type_state = "OU";
+                            }
+                        }
+                        String msg_path =
+                                dirpath + "/" + long_date_time_format_for_filename(ts) + "_" + msg_type_state + ".txt";
+                        // Log.i(TAG, "friend:xxx:F:M:" + msg_path);
+
+                        try
+                        {
+                            PrintWriter pr = new PrintWriter(msg_path, "UTF-8");
+                            pr.print(m.text);
+                            pr.close();
+                        }
+                        catch (Exception e)
+                        {
+                        }
+                    }
+                }
+
+                List<ConferenceDB> cl = orma.selectFromConferenceDB().
+                        kindEq(TOX_CONFERENCE_TYPE_TEXT.value).
+                        orderByConference_identifierAsc().
+                        toList();
+                for (ConferenceDB conf : cl)
+                {
+                    String dirpath = export_dir_string + "/" + conf.conference_identifier + "_" +
+                                     filter_out_specials_from_filepath_stricter(conf.name);
+                    // Log.i(TAG, "friend:xxx:C:" + dirpath);
+                    new File(dirpath).mkdirs();
+
+                    List<ConferenceMessage> cml = orma.selectFromConferenceMessage().
+                            conference_identifierEq(conf.conference_identifier).toList();
+                    for (ConferenceMessage cm : cml)
+                    {
+                        long ts = 0;
+                        String msg_type_state = "";
+                        if (cm.direction == 0)
+                        {
+                            // incoming msg
+                            ts = cm.rcvd_timestamp;
+                            msg_type_state = "I_";
+                        }
+                        else
+                        {
+                            // outgoing msg
+                            ts = cm.sent_timestamp;
+                            if (cm.read)
+                            {
+                                msg_type_state = "OR";
+                            }
+                            else
+                            {
+                                msg_type_state = "OU";
+                            }
+                        }
+                        String msg_path =
+                                dirpath + "/" + long_date_time_format_for_filename(ts) + "_" + msg_type_state + "_" +
+                                cm.tox_peerpubkey + "_" + filter_out_specials_from_filepath_stricter(cm.tox_peername) +
+                                ".txt";
+                        // Log.i(TAG, "friend:xxx:C:M:" + msg_path);
+
+                        try
+                        {
+                            PrintWriter pr = new PrintWriter(msg_path, "UTF-8");
+                            pr.print(cm.text);
+                            pr.close();
+                        }
+                        catch (Exception e)
+                        {
+                        }
+                    }
+                }
+
+                // now dump the DB to file in SQL format
+                final String dbs_path = c.getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
+                net.sqlcipher.database.SQLiteDatabase database = net.sqlcipher.database.SQLiteDatabase.openDatabase(
+                        dbs_path, PREF__DB_secrect_key, null, net.sqlcipher.database.SQLiteDatabase.OPEN_READWRITE);
+
+                final String sql_export_filename = export_dir_string + "/" + "export.sqlite";
+
+                touch(new File(sql_export_filename));
+                String sql = "ATTACH DATABASE '" + sql_export_filename + "' AS export KEY '';";
+                net.sqlcipher.Cursor cursor = database.rawQuery(sql, null);
+
+                Log.i(TAG, "export:chats:sqlfile:" + cursor.getColumnNames() + " " + cursor.getColumnCount() + " " +
+                           cursor.getCount());
+                cursor = database.rawQuery("SELECT sqlcipher_export('export');", null);
+                Log.i(TAG, "export:chats:sqlfile:" + cursor.getColumnNames() + " " + cursor.getColumnCount() + " " +
+                           cursor.getCount());
+                cursor = database.rawQuery("DETACH DATABASE export;", null);
+                Log.i(TAG, "export:chats:sqlfile:" + cursor.getColumnNames() + " " + cursor.getColumnCount() + " " +
+                           cursor.getCount());
+                database.close();
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "export:chats:EE01:" + e.getMessage());
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result)
+        {
+            if (dialog.isShowing())
+            {
+                dialog.dismiss();
+            }
+
+            Toast.makeText(c, "export ready", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private static class export_enc_files_async_task extends AsyncTask<Void, Void, Void>
+    {
+        private ProgressDialog dialog;
+        private final Context c;
+
+        public export_enc_files_async_task(Context c)
+        {
+            this.c = c;
+            dialog = new ProgressDialog(c);
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            dialog.setMessage("exporting ...");
+            dialog.setCancelable(false);
+            dialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... args)
+        {
+            String export_dir_string = MainActivity.SD_CARD_FILES_EXPORT_DIR + SD_CARD_ENC_FILES_EXPORT_DIR;
+
+            try
+            {
+                File export_dir = new File(export_dir_string);
+                export_dir.mkdirs();
+                List<IOBrowser.dir_item> l = getFilesInDir("/datadir/files/");
+
+                for (IOBrowser.dir_item friend_dir : l)
+                {
+                    if (friend_dir.get_is_dir())
+                    {
+                        File export_friend_dir = new File(export_dir_string + "/" + friend_dir.get_path());
+                        // Log.i(TAG, "export:mkdir1:" + export_friend_dir);
+                        export_friend_dir.mkdirs();
+                        List<IOBrowser.dir_item> f = getFilesInDir("/datadir/files/" + friend_dir.get_path());
+
+                        for (IOBrowser.dir_item friend_file : f)
+                        {
+                            if (!friend_file.get_is_dir())
+                            {
+                                // Log.i(TAG, "export:mkdir2:" + export_friend_dir);
+                                export_friend_dir.mkdirs();
+
+                                //Log.i(TAG, "export:2:" +
+                                //           ("/datadir/files/" + friend_dir.get_path() + "/" + friend_file.get_path()) +
+                                //           " --> " + export_friend_dir + "/" + friend_file.get_path());
+
+                                try
+                                {
+                                    HelperGeneric.export_vfs_file_to_real_file(
+                                            "/datadir/files/" + friend_dir.get_path() + "/", friend_file.get_path(),
+                                            export_friend_dir + "/", friend_file.get_path());
+                                }
+                                catch (Exception e)
+                                {
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result)
+        {
+            if (dialog.isShowing())
+            {
+                dialog.dismiss();
+            }
+
+            Toast.makeText(c, "export ready", Toast.LENGTH_LONG).show();
+        }
     }
 
     public static String files_and_sizes_in_dir(File directory)

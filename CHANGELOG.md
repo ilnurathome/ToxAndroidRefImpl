@@ -2,7 +2,168 @@
 
 ## [Unreleased](https://github.com/zoff99/ToxAndroidRefImpl/tree/HEAD)
 
-[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.92...HEAD)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.112...HEAD)
+
+**Merged pull requests:**
+
+- Translations update from Weblate [\#285](https://github.com/zoff99/ToxAndroidRefImpl/pull/285) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#284](https://github.com/zoff99/ToxAndroidRefImpl/pull/284) ([weblate](https://github.com/weblate))
+- make dual licensing explicit \(since it was always implicity GPLv2 and GPLv3 because of toxcore\) [\#280](https://github.com/zoff99/ToxAndroidRefImpl/pull/280) ([zoff99](https://github.com/zoff99))
+
+## [1.0.112](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.112) (2021-07-22)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.111...1.0.112)
+
+**Implemented enhancements:**
+
+- update deps and tweak libsodium configure options/flags [\#282](https://github.com/zoff99/ToxAndroidRefImpl/pull/282) ([zoff99](https://github.com/zoff99))
+
+**Fixed bugs:**
+
+- Calls crash from binary-source TRIfA on Broadcom/OpenMAX-based device; source-built TRIfA works fine [\#278](https://github.com/zoff99/ToxAndroidRefImpl/issues/278)
+
+**Merged pull requests:**
+
+- Translations update from Weblate [\#283](https://github.com/zoff99/ToxAndroidRefImpl/pull/283) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#281](https://github.com/zoff99/ToxAndroidRefImpl/pull/281) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#279](https://github.com/zoff99/ToxAndroidRefImpl/pull/279) ([weblate](https://github.com/weblate))
+
+## [1.0.111](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.111) (2021-07-01)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.110...1.0.111)
+
+## [1.0.110](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.110) (2021-06-24)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.109...1.0.110)
+
+**Implemented enhancements:**
+
+- Disable screenshots option [\#261](https://github.com/zoff99/ToxAndroidRefImpl/issues/261)
+
+**Fixed bugs:**
+
+- Fastlane directory uses invalid names for some locales [\#253](https://github.com/zoff99/ToxAndroidRefImpl/issues/253)
+- ToxProxy AppImage generates \(apparently\) invalid ToxIDs [\#239](https://github.com/zoff99/ToxAndroidRefImpl/issues/239)
+- Tox Service Notification Text is sometimes unreadable \(text color equals background color\) [\#213](https://github.com/zoff99/ToxAndroidRefImpl/issues/213)
+- Battery savings mode sometimes does not got into deep sleep anymore [\#142](https://github.com/zoff99/ToxAndroidRefImpl/issues/142)
+
+**Merged pull requests:**
+
+- Translations update from Weblate [\#277](https://github.com/zoff99/ToxAndroidRefImpl/pull/277) ([weblate](https://github.com/weblate))
+
+## [1.0.109](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.109) (2021-06-22)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.108...1.0.109)
+
+**Merged pull requests:**
+
+- Translations update from Weblate [\#275](https://github.com/zoff99/ToxAndroidRefImpl/pull/275) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#274](https://github.com/zoff99/ToxAndroidRefImpl/pull/274) ([weblate](https://github.com/weblate))
+
+## [1.0.108](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.108) (2021-06-18)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.107...1.0.108)
+
+**Merged pull requests:**
+
+- Translations update from Weblate [\#272](https://github.com/zoff99/ToxAndroidRefImpl/pull/272) ([weblate](https://github.com/weblate))
+
+## [1.0.107](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.107) (2021-06-17)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.106...1.0.107)
+
+## [1.0.106](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.106) (2021-06-13)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.105...1.0.106)
+
+## [1.0.105](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.105) (2021-06-13)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.104...1.0.105)
+
+## [1.0.104](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.104) (2021-06-08)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.103...1.0.104)
+
+## [1.0.103](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.103) (2021-06-07)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.102...1.0.103)
+
+## [1.0.102](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.102) (2021-06-03)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.101...1.0.102)
+
+**Merged pull requests:**
+
+- Translations update from Weblate [\#271](https://github.com/zoff99/ToxAndroidRefImpl/pull/271) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#270](https://github.com/zoff99/ToxAndroidRefImpl/pull/270) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#269](https://github.com/zoff99/ToxAndroidRefImpl/pull/269) ([weblate](https://github.com/weblate))
+
+## [1.0.101](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.101) (2021-05-26)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.100...1.0.101)
+
+## [1.0.100](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.100) (2021-05-24)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.99...1.0.100)
+
+**Merged pull requests:**
+
+- Translations update from Weblate [\#268](https://github.com/zoff99/ToxAndroidRefImpl/pull/268) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#267](https://github.com/zoff99/ToxAndroidRefImpl/pull/267) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#266](https://github.com/zoff99/ToxAndroidRefImpl/pull/266) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#265](https://github.com/zoff99/ToxAndroidRefImpl/pull/265) ([weblate](https://github.com/weblate))
+
+## [1.0.99](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.99) (2021-05-01)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.98...1.0.99)
+
+## [1.0.98](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.98) (2021-04-27)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.97...1.0.98)
+
+## [1.0.97](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.97) (2021-04-25)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.96...1.0.97)
+
+**Fixed bugs:**
+
+- Crash on start [\#217](https://github.com/zoff99/ToxAndroidRefImpl/issues/217)
+
+**Merged pull requests:**
+
+- Translations update from Weblate [\#264](https://github.com/zoff99/ToxAndroidRefImpl/pull/264) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#263](https://github.com/zoff99/ToxAndroidRefImpl/pull/263) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#262](https://github.com/zoff99/ToxAndroidRefImpl/pull/262) ([weblate](https://github.com/weblate))
+
+## [1.0.96](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.96) (2021-03-29)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.95...1.0.96)
+
+**Merged pull requests:**
+
+- Translations update from Weblate [\#260](https://github.com/zoff99/ToxAndroidRefImpl/pull/260) ([weblate](https://github.com/weblate))
+
+## [1.0.95](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.95) (2021-03-21)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.94...1.0.95)
+
+**Fixed bugs:**
+
+- Putting a password ends up locking you out later on [\#207](https://github.com/zoff99/ToxAndroidRefImpl/issues/207)
+- TRIfA not compatible with replicant [\#177](https://github.com/zoff99/ToxAndroidRefImpl/issues/177)
+
+**Merged pull requests:**
+
+- Translations update from Weblate [\#238](https://github.com/zoff99/ToxAndroidRefImpl/pull/238) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#237](https://github.com/zoff99/ToxAndroidRefImpl/pull/237) ([weblate](https://github.com/weblate))
+
+## [1.0.94](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.94) (2021-02-19)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.93...1.0.94)
+
+## [1.0.93](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.93) (2021-02-06)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.92...1.0.93)
 
 **Fixed bugs:**
 
@@ -11,7 +172,7 @@
 **Merged pull requests:**
 
 - Translations update from Weblate [\#234](https://github.com/zoff99/ToxAndroidRefImpl/pull/234) ([weblate](https://github.com/weblate))
--  Thomas copy duplicate conference message from ToxProxy recieve to normal recieve [\#232](https://github.com/zoff99/ToxAndroidRefImpl/pull/232) ([kaefert](https://github.com/kaefert))
+- copy duplicate conference message from ToxProxy recieve to normal recieve [\#232](https://github.com/zoff99/ToxAndroidRefImpl/pull/232) ([kaefert](https://github.com/kaefert))
 - Translations update from Weblate [\#231](https://github.com/zoff99/ToxAndroidRefImpl/pull/231) ([weblate](https://github.com/weblate))
 
 ## [1.0.92](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.92) (2021-01-30)
@@ -191,8 +352,6 @@
 
 **Fixed bugs:**
 
-- - [\#184](https://github.com/zoff99/ToxAndroidRefImpl/issues/184)
-- - [\#183](https://github.com/zoff99/ToxAndroidRefImpl/issues/183)
 - Latest grapheneos build cant send images [\#181](https://github.com/zoff99/ToxAndroidRefImpl/issues/181)
 
 **Merged pull requests:**
@@ -200,6 +359,7 @@
 - Translations update from Weblate [\#187](https://github.com/zoff99/ToxAndroidRefImpl/pull/187) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#186](https://github.com/zoff99/ToxAndroidRefImpl/pull/186) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#185](https://github.com/zoff99/ToxAndroidRefImpl/pull/185) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#182](https://github.com/zoff99/ToxAndroidRefImpl/pull/182) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#180](https://github.com/zoff99/ToxAndroidRefImpl/pull/180) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#179](https://github.com/zoff99/ToxAndroidRefImpl/pull/179) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#178](https://github.com/zoff99/ToxAndroidRefImpl/pull/178) ([weblate](https://github.com/weblate))
@@ -218,7 +378,6 @@
 
 **Merged pull requests:**
 
-- Translations update from Weblate [\#182](https://github.com/zoff99/ToxAndroidRefImpl/pull/182) ([weblate](https://github.com/weblate))
 - Improve profile activity [\#175](https://github.com/zoff99/ToxAndroidRefImpl/pull/175) ([naxuroqa](https://github.com/naxuroqa))
 - Fix typo [\#172](https://github.com/zoff99/ToxAndroidRefImpl/pull/172) ([licaon-kter](https://github.com/licaon-kter))
 
@@ -301,11 +460,14 @@
 **Merged pull requests:**
 
 - migrate to androidx [\#147](https://github.com/zoff99/ToxAndroidRefImpl/pull/147) ([zoff99](https://github.com/zoff99))
-- Add Kannada translation [\#146](https://github.com/zoff99/ToxAndroidRefImpl/pull/146) ([ehmry](https://github.com/ehmry))
 
 ## [1.0.51](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.51) (2020-06-02)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.50...1.0.51)
+
+**Merged pull requests:**
+
+- Add Kannada translation [\#146](https://github.com/zoff99/ToxAndroidRefImpl/pull/146) ([ehmry](https://github.com/ehmry))
 
 ## [1.0.50](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.50) (2020-05-31)
 
@@ -685,3 +847,6 @@
 - updates [\#3](https://github.com/zoff99/ToxAndroidRefImpl/pull/3) ([zoff99](https://github.com/zoff99))
 - updates [\#1](https://github.com/zoff99/ToxAndroidRefImpl/pull/1) ([zoff99](https://github.com/zoff99))
 
+
+
+\* *This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)*

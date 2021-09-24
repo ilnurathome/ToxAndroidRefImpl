@@ -7,10 +7,39 @@
         android:title="@string/pref_title_start_on_boot" />
 
     <SwitchPreference
+        android:defaultValue="false"
+        android:key="use_push_service"
+        android:summary="@string/pref_description_use_push_service"
+        android:title="@string/pref_title_use_push_service" />
+
+    <Preference
+        android:title="@string/pref_title_download_push_msg_app"
+        android:key="download_push_msg_app"
+        android:summary="__" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="compact_friendlist"
+        android:summary="@string/pref_description_compact_friendlist"
+        android:title="@string/pref_title_compact_friendlist" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="compact_chatlist"
+        android:summary="@string/pref_description_compact_chatlist"
+        android:title="@string/pref_title_compact_chatlist" />
+
+    <SwitchPreference
         android:defaultValue="true"
         android:key="use_incognito_keyboard"
         android:summary="@string/pref_description_use_incognito_keyboard"
         android:title="@string/pref_title_use_incognito_keyboard" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="window_security"
+        android:summary="@string/pref_description_window_security"
+        android:title="@string/pref_title_window_security" />
 
     <SwitchPreference
         android:defaultValue="true"
@@ -30,8 +59,9 @@
         android:summary="@string/pref_description_auto_accept_all_upto"
         android:title="@string/pref_title_auto_accept_all_upto" />
 
+    <!-- set default value to PREF_GLOBAL_FONT_SIZE_DEFAULT -->
     <ListPreference
-        android:defaultValue="1"
+        android:defaultValue="2"
         android:entries="@array/pref_global_font_size_titles"
         android:entryValues="@array/pref_global_font_size_values"
         android:key="global_font_size"
@@ -39,6 +69,12 @@
         android:positiveButtonText="@null"
         android:summary="@string/pref_description_global_font_size"
         android:title="@string/pref_title_global_font_size" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="allow_file_sharing_to_trifa_via_intent"
+        android:summary="@string/pref_description_allow_file_sharing_to_trifa_via_intent"
+        android:title="@string/pref_title_allow_file_sharing_to_trifa_via_intent" />
 
     <SwitchPreference
         android:defaultValue="true"
@@ -152,6 +188,30 @@
         android:key="force_udp_only"
         android:summary="@string/pref_description_force_udp_only"
         android:title="@string/pref_title_force_udp_only" />
+
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="toxirc_muted_peers_01"
+        android:maxLength="100"
+        android:singleLine="true"
+        android:summary="@string/pref_description_toxirc_muted_peers_01"
+        android:title="@string/pref_title_toxirc_muted_peers_01" />
+
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="toxirc_muted_peers_02"
+        android:maxLength="100"
+        android:singleLine="true"
+        android:summary="@string/pref_description_toxirc_muted_peers_02"
+        android:title="@string/pref_title_toxirc_muted_peers_01" />
+
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="toxirc_muted_peers_03"
+        android:maxLength="100"
+        android:singleLine="true"
+        android:summary="@string/pref_description_toxirc_muted_peers_03"
+        android:title="@string/pref_title_toxirc_muted_peers_01" />
 
     <PreferenceCategory android:title="! unsafe !">
 

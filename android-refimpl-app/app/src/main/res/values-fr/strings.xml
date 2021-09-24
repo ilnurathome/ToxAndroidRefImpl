@@ -26,7 +26,7 @@
     <string name="settings_toolbar_title">Réglages</string>
     <string name="pref_header_general">Général</string>
     <string name="pref_title_auto_accept_image">accepter automatiquement l\'image</string>
-    <string name="pref_description_auto_accept_image">accepter automatiquement les images et les photos d\'une taille maximale de 6 Mo</string>
+    <string name="pref_description_auto_accept_image">accepter automatiquement les images et les photos d\'une taille maximale de 12 Mo</string>
     <string name="pref_title_video_uv_reversed">inverser les UV en vidéo</string>
     <string name="pref_description_video_uv_reversed">Inverser l\'ordre des plans UV dans la vidéo de la caméra</string>
     <string name="pref_title_software_echo_cancel">Annulation d\'écho</string>
@@ -300,7 +300,7 @@
     <string name="pref_title_global_font_size">Taille de la police</string>
     <string name="pref_description_video_cam_resolution">Quelle résolution utiliser pour l’appel vidéo</string>
     <string name="pref_title_video_cam_resolution">Résolution de la caméra</string>
-    <string name="pref_description_auto_accept_video">accepter automatiquement les vidéos jusqu\'à 20 Mo</string>
+    <string name="pref_description_auto_accept_video">accepter automatiquement les vidéos jusqu\'à 40 Mo</string>
     <string name="pref_title_auto_accept_video">accepter automatiquement les vidéos</string>
     <string name="conference_audio_activity_player_name">Lecteur de conférence audio</string>
     <string name="pref_description_X_audio_play_buffer_custom">! ! Expérimental ! !
@@ -329,4 +329,35 @@
     <string name="MyMainActivity_yes_button">oui</string>
     <string name="pref_description_auto_accept_all_upto">accepter automatiquement tous les fichiers d\'une taille maximale de 200 Mo</string>
     <string name="pref_title_auto_accept_all_upto">accepter automatiquement tous les fichiers</string>
+    <string name="pref_description_start_on_boot">exécute l’application après le démarrage.
+\nGoogle ne permet plus cela à partir d’Android 10</string>
+    <string name="pref_title_start_on_boot">exécuter au démarrage</string>
+    <string name="pref_description_compact_chatlist">Affichage de la messagerie instantanée plus compact et moins encombrant</string>
+    <string name="pref_title_compact_chatlist">Liste de discussion compacte</string>
+    <string name="pref_description_compact_friendlist">Rends la liste d\'amis plus compacte, si vous avez une grande liste d\'amis</string>
+    <string name="pref_title_compact_friendlist">Liste d\'amis compacte</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">exporter des conversations cryptées *non sécurisé*</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">exporter des fichiers cryptés *non sécurisé*</string>
+    <string name="pref_description_toxirc_muted_peers_03">Utilisateur en sourdine 3 (laisser vide s’il n’est pas utilisé)</string>
+    <string name="pref_description_toxirc_muted_peers_02">Utilisateur en sourdine 2 (laisser vide s’il n’est pas utilisé)</string>
+    <string name="pref_description_toxirc_muted_peers_01">Utilisateur en sourdine 1 (laisser vide s’il n’est pas utilisé)</string>
+    <string name="pref_title_toxirc_muted_peers_01">Utilisateurs en sourdine Toxirc Bridge</string>
+    <string name="pref_description_window_security">L\'activation de ce paramètre ajoute FLAG_SECURE aux activités.
+\nIl empêche les captures d\'écran et l\'enregistrement d\'écran ainsi que l\'affichage du contenu dans l\'aperçu des récents</string>
+    <string name="pref_title_window_security">empêcher les captures d’écran</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">partager des fichiers avec TRIfA via Share Intent.</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">partager des fichiers</string>
+    <string name="layout___own_pushurl">URL du Push :</string>
+    <string name="layout___remove_own_pushurl">supprimer l’URL du Push</string>
+    <string name="layout___friends_pushurl">URL push des amis :</string>
+    <string name="layout___remove_friends_pushurl">supprimer l\'URL Push des amis</string>
+    <string name="pref_description_use_push_service">AVERTISSEMENT : Cette application utilisera Google FCM ou Unified Push pour économiser la batterie et la bande passante.
+\nL\'application établira des connexions HTTPS : avec certains serveurs PUSH directement (pas via Tox).
+\nN\'activez cette fonction que si vous l\'acceptez.
+\nCette fonction nécessite l\'installation de l\'application Tox Push Message.</string>
+    <string name="pref_title_use_push_service">Utiliser le service Push</string>
+    <string name="layout___conf_title">Titre :</string>
+    <string name="layout___conf_id">Identifiant de la conférence :</string>
+    <string name="pref_title_download_push_msg_app">Télécharger l\'application Push Message</string>
+    <string name="title_activity_conferenceinfo">Infos sur la conférence</string>
 </resources>

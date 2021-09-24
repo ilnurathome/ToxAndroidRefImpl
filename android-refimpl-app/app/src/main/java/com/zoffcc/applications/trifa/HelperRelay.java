@@ -23,8 +23,17 @@ import android.util.Log;
 
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_FCM_PUSH_URL_PREFIX;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_FCM_PUSH_URL_PREFIX_OLD;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_UP_PUSH_URL_PREFIX;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -68,8 +77,7 @@ public class HelperRelay
         {
             if (!is_any_relay(friend_pubkey))
             {
-                FriendList fl = HelperFriend.main_get_friend(
-                        HelperFriend.tox_friend_by_public_key__wrapper(friend_pubkey));
+                FriendList fl = HelperFriend.main_get_friend(tox_friend_by_public_key__wrapper(friend_pubkey));
 
                 if (fl != null)
                 {
@@ -165,7 +173,7 @@ public class HelperRelay
                 for (i = 0; i < fl.size(); i++)
                 {
                     FriendList n = fl.get(i);
-                    friend_num = HelperFriend.tox_friend_by_public_key__wrapper(n.tox_public_key_string);
+                    friend_num = tox_friend_by_public_key__wrapper(n.tox_public_key_string);
                     byte[] data = HelperGeneric.hex_to_bytes("FF" + relay_public_key_string);
                     data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND.value;
                     MainActivity.tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
@@ -185,7 +193,7 @@ public class HelperRelay
             if (fl.size() > 0)
             {
                 int i = 0;
-                long friend_num = HelperFriend.tox_friend_by_public_key__wrapper(relay_public_key_string);
+                long friend_num = tox_friend_by_public_key__wrapper(relay_public_key_string);
 
                 for (i = 0; i < fl.size(); i++)
                 {
@@ -214,9 +222,8 @@ public class HelperRelay
                     for (int i = 0; i < c.size(); i++)
                     {
                         ConferenceDB conf = c.get(i);
-                        int res = MainActivity.tox_conference_invite(
-                                HelperFriend.tox_friend_by_public_key__wrapper(relay_public_key_string),
-                                conf.tox_conference_number);
+                        int res = tox_conference_invite(tox_friend_by_public_key__wrapper(relay_public_key_string),
+                                                        conf.tox_conference_number);
 
                         // Log.i(TAG,
                         //       "invite_to_all_conferences_own_relay:confnum=" + conf.tox_conference_number + " res=" +
@@ -230,6 +237,12 @@ public class HelperRelay
         {
             e.printStackTrace();
         }
+    }
+
+    static int invite_to_conference_own_relay(long conference_num)
+    {
+        return tox_conference_invite(tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
+                                     conference_num);
     }
 
     static boolean is_any_relay(String friend_pubkey)
@@ -251,7 +264,7 @@ public class HelperRelay
     static void send_friend_pubkey_to_relay(String relay_public_key_string, String friend_pubkey)
     {
         int i = 0;
-        long friend_num = HelperFriend.tox_friend_by_public_key__wrapper(relay_public_key_string);
+        long friend_num = tox_friend_by_public_key__wrapper(relay_public_key_string);
         byte[] data = HelperGeneric.hex_to_bytes("FF" + friend_pubkey);
         data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY.value;
         // Log.d(TAG, "send_friend_pubkey_to_relay:data=" + data);
@@ -262,7 +275,7 @@ public class HelperRelay
     static void send_relay_pubkey_to_friend(String relay_public_key_string, String friend_pubkey)
     {
         int i = 0;
-        long friend_num = HelperFriend.tox_friend_by_public_key__wrapper(friend_pubkey);
+        long friend_num = tox_friend_by_public_key__wrapper(friend_pubkey);
         byte[] data = HelperGeneric.hex_to_bytes("FF" + relay_public_key_string);
         data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND.value;
         // Log.d(TAG, "send_relay_pubkey_to_friend:data=" + data);
@@ -281,6 +294,62 @@ public class HelperRelay
         }
 
         return ret;
+    }
+
+    static void own_push_token_load()
+    {
+        if (TRIFAGlobals.global_notification_token == null)
+        {
+            if (get_g_opts(NOTIFICATION_TOKEN_DB_KEY) != null)
+            {
+                TRIFAGlobals.global_notification_token = get_g_opts(NOTIFICATION_TOKEN_DB_KEY);
+            }
+        }
+    }
+
+    static String push_token_to_push_url(final String push_token)
+    {
+        if (push_token != null)
+        {
+            // I dont have a relay, but i have a PUSH token
+            String notification_push_url = push_token;
+            if (push_token.startsWith("https://"))
+            {
+                // this must be a gotify/unifiedpush token
+            }
+            else
+            {
+                // this must be a google FCM token, add the porper HTTPS url here
+                notification_push_url = NOTIFICATION_FCM_PUSH_URL_PREFIX + push_token;
+            }
+
+            if (notification_push_url.length() < 1000)
+            {
+                return notification_push_url;
+            }
+        }
+
+        return null;
+    }
+
+    static boolean have_own_pushurl()
+    {
+        try
+        {
+            if (get_g_opts(NOTIFICATION_TOKEN_DB_KEY) != null)
+            {
+                final String tmp = get_g_opts(NOTIFICATION_TOKEN_DB_KEY);
+                if (tmp.length() > 5)
+                {
+                    return true;
+                }
+            }
+        }
+        catch (Exception ignored)
+        {
+        }
+
+        return false;
     }
 
     static FriendList get_friend_for_relay(String relay_pubkey)
@@ -339,6 +408,21 @@ public class HelperRelay
         return ret;
     }
 
+    static int get_own_relay_connection_status_real()
+    {
+        int ret = 0;
+
+        try
+        {
+            return is_friend_online_real(tox_friend_by_public_key__wrapper(get_own_relay_pubkey()));
+        }
+        catch (Exception e)
+        {
+        }
+
+        return ret;
+    }
+
     static String get_relay_for_friend(String friend_pubkey)
     {
         String ret = null;
@@ -353,6 +437,54 @@ public class HelperRelay
         }
 
         return ret;
+    }
+
+    static String get_pushurl_for_friend(String friend_pubkey)
+    {
+        String ret = null;
+
+        try
+        {
+            ret = orma.selectFromFriendList().tox_public_key_stringEq(friend_pubkey).get(0).push_url;
+        }
+        catch (Exception e)
+        {
+        }
+
+        return ret;
+    }
+
+    static boolean is_valid_pushurl_for_friend_with_whitelist(String push_url)
+    {
+        // whitelist google FCM gateway
+        if (push_url.length() > NOTIFICATION_FCM_PUSH_URL_PREFIX.length())
+        {
+            if (push_url.startsWith(NOTIFICATION_FCM_PUSH_URL_PREFIX))
+            {
+                return true;
+            }
+        }
+
+        // whitelist OLD google FCM gateway
+        if (push_url.length() > NOTIFICATION_FCM_PUSH_URL_PREFIX_OLD.length())
+        {
+            if (push_url.startsWith(NOTIFICATION_FCM_PUSH_URL_PREFIX_OLD))
+            {
+                return true;
+            }
+        }
+
+        // whitelist unified push demo server
+        if (push_url.length() > NOTIFICATION_UP_PUSH_URL_PREFIX.length())
+        {
+            if (push_url.startsWith(NOTIFICATION_UP_PUSH_URL_PREFIX))
+            {
+                return true;
+            }
+        }
+
+        // anything else is not allowed at this time!
+        return false;
     }
 
     static boolean set_friend_as_own_relay_in_db(String friend_public_key)
@@ -433,6 +565,19 @@ public class HelperRelay
         return ret;
     }
 
+    static void remove_friend_pushurl_in_db(String friend_pubkey)
+    {
+        try
+        {
+            orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
+                    push_url(null).execute();
+        }
+        catch (Exception e1)
+        {
+            Log.i(TAG, "remove_friend_pushurl_in_db:EE3:" + e1.getMessage());
+        }
+    }
+
     static boolean remove_own_relay_in_db()
     {
         boolean ret = false;
@@ -461,5 +606,10 @@ public class HelperRelay
         }
 
         return ret;
+    }
+
+    static void remove_own_pushurl_in_db()
+    {
+        del_g_opts(NOTIFICATION_TOKEN_DB_KEY);
     }
 }

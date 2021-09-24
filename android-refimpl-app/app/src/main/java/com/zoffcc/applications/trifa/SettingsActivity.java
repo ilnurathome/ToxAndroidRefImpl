@@ -21,6 +21,7 @@ package com.zoffcc.applications.trifa;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.media.Ringtone;
@@ -34,7 +35,6 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.preference.SwitchPreference;
-import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +44,11 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import java.util.List;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_PUSH_MSG_APP;
 
 public class SettingsActivity extends AppCompatPreferenceActivity
 {
@@ -149,8 +154,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity
         // current value.
         sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
                                                                  PreferenceManager.getDefaultSharedPreferences(
-                                                                     preference.getContext()).getString(
-                                                                     preference.getKey(), ""));
+                                                                         preference.getContext()).getString(
+                                                                         preference.getKey(), ""));
     }
 
     /**
@@ -188,17 +193,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_general);
 
-            final SwitchPreference pref = (SwitchPreference) findPreference("U_keep_nospam");
+            final SwitchPreference pref_keepnpspam = (SwitchPreference) findPreference("U_keep_nospam");
 
-
-            if (pref.isChecked() == true)
+            if (pref_keepnpspam.isChecked() == true)
             {
                 try
                 {
-                    final Drawable d1 = new IconicsDrawable(pref.getContext()).
-                        icon(FontAwesome.Icon.faw_exclamation_circle).
-                        color(getResources().getColor(R.color.md_red_700)).sizeDp(100);
-                    pref.setIcon(d1);
+                    final Drawable d1 = new IconicsDrawable(pref_keepnpspam.getContext()).
+                            icon(FontAwesome.Icon.faw_exclamation_circle).
+                            color(getResources().getColor(R.color.md_red_700)).sizeDp(100);
+                    pref_keepnpspam.setIcon(d1);
                 }
                 catch (Exception e)
                 {
@@ -209,7 +213,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity
             {
                 try
                 {
-                    pref.setIcon(null);
+                    pref_keepnpspam.setIcon(null);
                 }
                 catch (Exception e)
                 {
@@ -217,7 +221,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                 }
             }
 
-            pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            pref_keepnpspam.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
             {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue)
@@ -228,9 +232,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                         try
                         {
                             final Drawable d1 = new IconicsDrawable(preference.getContext()).
-                                icon(FontAwesome.Icon.faw_exclamation_circle).
-                                color(getResources().getColor(R.color.md_red_600)).
-                                sizeDp(100);
+                                    icon(FontAwesome.Icon.faw_exclamation_circle).
+                                    color(getResources().getColor(R.color.md_red_600)).
+                                    sizeDp(100);
                             preference.setIcon(d1);
                         }
                         catch (Exception e)
@@ -249,6 +253,69 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                             e.printStackTrace();
                         }
                     }
+                    return true;
+                }
+            });
+
+            final SwitchPreference pref_startonboot = (SwitchPreference) findPreference("start_on_boot");
+
+            pref_startonboot.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    if (newValue == (Object) true)
+                    {
+                        try
+                        {
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q)
+                            {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
+                                builder.setTitle("Android 10 and up");
+                                // @formatter:off
+                                builder.setMessage(
+                                        "\n"+
+                                        "Starting with Android 10 you must enable a setting that the App can start on Boot and display the Password Screen.\n"+
+                                        "Go to Android App Settings for TRIfA and select:\n\n"+
+                                        "     \"Display over other apps\"\n\n"+
+                                        "then enable\n\n"+
+                                        "     \"Allow display over other apps\""+
+                                        "\n\n"+
+                                        "Sorry for the inconvenience, Google Android does not allow it any other way.\n\n"+
+                                        "See:\n\n"+
+                                        "https://developer.android.com/guide/components/activities/background-starts\n\n"+
+                                        "for more details.\n"
+                                );
+                                // @formatter:on
+
+                                builder.setPositiveButton("OK", null);
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                    else
+                    {
+                    }
+                    return true;
+                }
+            });
+
+            Preference pref_download_push_msg_app = (Preference) findPreference("download_push_msg_app");
+            pref_download_push_msg_app.setSummary(TOX_PUSH_MSG_APP);
+
+            pref_download_push_msg_app.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(TOX_PUSH_MSG_APP));
+                    startActivity(i);
                     return true;
                 }
             });

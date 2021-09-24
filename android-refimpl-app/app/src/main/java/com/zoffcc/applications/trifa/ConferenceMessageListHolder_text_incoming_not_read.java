@@ -57,15 +57,20 @@ import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
 import static com.zoffcc.applications.trifa.HelperGeneric.isColorDarkBrightness;
 import static com.zoffcc.applications.trifa.HelperGeneric.lightenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
-import static com.zoffcc.applications.trifa.MyMainActivity.PREF__global_font_size;
+import static com.zoffcc.applications.trifa.HelperGeneric.string_is_in_list;
+import static com.zoffcc.applications.trifa.Identicon.bytesToHex;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__toxirc_muted_peers;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
-import static com.zoffcc.applications.trifa.MessageListActivity.add_quote_message_text;
-import static com.zoffcc.applications.trifa.MessageListFragment.search_messages_text;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGES_TIMEDELTA_NO_TIMESTAMP_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXIRC_PUBKEY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXIRC_TOKTOK_CONFID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -120,6 +125,28 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     public void bindMessageList(ConferenceMessage m)
     {
         message_ = m;
+
+        String message__text = m.text;
+        String message__tox_peername = m.tox_peername;
+        String message__tox_peerpubkey = m.tox_peerpubkey;
+
+        boolean handle_special_name = false;
+
+        name_test_pk res = correct_pubkey(m);
+        if (res.changed)
+        {
+            try
+            {
+                message__tox_peername = res.tox_peername;
+                peer_name_text.setText(message__tox_peername);
+                message__text = res.text;
+                message__tox_peerpubkey = res.tox_peerpubkey;
+                handle_special_name = true;
+            }
+            catch (Exception e)
+            {
+            }
+        }
 
         swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener()
         {
@@ -188,8 +215,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         // Log.i(TAG, "have_avatar_for_pubkey:0000:==========================");
 
-        is_system_message = m.tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY);
-        // Log.i(TAG, "is_system_message=" + is_system_message + " m.tox_peerpubkey=" + m.tox_peerpubkey);
+        is_system_message = message__tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY);
+        // Log.i(TAG, "is_system_message=" + is_system_message + " message__tox_peerpubkey=" + message__tox_peerpubkey);
 
         is_selected = false;
         if (selected_messages.isEmpty())
@@ -233,20 +260,20 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         // Log.i(TAG, "bindMessageList");
 
-        // textView.setText("#" + m.id + ":" + m.text);
+        // textView.setText("#" + m.id + ":" + message__text);
         textView.setCustomRegex(TOXURL_PATTERN);
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
                                  AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
 
         try
         {
-            String peer_name = tox_conference_peer_get_name__wrapper(m.conference_identifier, m.tox_peerpubkey);
+            String peer_name = tox_conference_peer_get_name__wrapper(m.conference_identifier, message__tox_peerpubkey);
 
             if (peer_name == null)
             {
-                peer_name = m.tox_peername;
+                peer_name = message__tox_peername;
 
-                if ((peer_name == null) || (m.tox_peername.equals("")) || (peer_name.equals("-1")))
+                if ((peer_name == null) || (message__tox_peername.equals("")) || (peer_name.equals("-1")))
                 {
                     peer_name = "Unknown";
                 }
@@ -255,13 +282,13 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             {
                 if (peer_name.equals("-1"))
                 {
-                    if ((m.tox_peername == null) || (m.tox_peername.equals("")))
+                    if ((message__tox_peername == null) || (message__tox_peername.equals("")))
                     {
                         peer_name = "Unknown";
                     }
                     else
                     {
-                        peer_name = m.tox_peername;
+                        peer_name = message__tox_peername;
                     }
                 }
             }
@@ -269,8 +296,9 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             layout_peer_name_container.setVisibility(View.VISIBLE);
             try
             {
-                peer_name_text.setText(peer_name + " / " + m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6),
-                                                                                      m.tox_peerpubkey.length()));
+                peer_name_text.setText(peer_name + " / " +
+                                       message__tox_peerpubkey.substring((message__tox_peerpubkey.length() - 6),
+                                                                         message__tox_peerpubkey.length()));
             }
             catch (Exception e2)
             {
@@ -286,13 +314,13 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             Log.i(TAG, "bindMessageList:EE:" + e.getMessage());
         }
 
-        //        textView.setAutoLinkText("" + m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6),
+        //        textView.setAutoLinkText("" + message__tox_peerpubkey.substring((message__tox_peerpubkey.length() - 6),
         //                //
-        //                m.tox_peerpubkey.length())
+        //                message__tox_peerpubkey.length())
         //                //
-        //                + ":" + m.text);
+        //                + ":" + message__text);
 
-        if (com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(m.text))
+        if (com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(message__text))
         {
             // text consits only of emojis -> increase size
             textView.setEmojiSize((int) dp2px(MESSAGE_EMOJI_ONLY_EMOJI_SIZE[PREF__global_font_size]));
@@ -321,8 +349,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         try
         {
             peer_color_bg = ChatColors.get_shade(
-                    ChatColors.PeerAvatarColors[hash_to_bucket(m.tox_peerpubkey, ChatColors.get_size())],
-                    m.tox_peerpubkey);
+                    ChatColors.PeerAvatarColors[hash_to_bucket(message__tox_peerpubkey, ChatColors.get_size())],
+                    message__tox_peerpubkey);
             // peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
             textView.setTextColor(Color.BLACK);
 
@@ -347,11 +375,11 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         if ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0))
         {
-            textView.setAutoLinkText(m.text);
+            textView.setAutoLinkText(message__text);
         }
         else
         {
-            textView.setAutoLinkTextHighlight(m.text, conf_search_messages_text);
+            textView.setAutoLinkTextHighlight(message__text, conf_search_messages_text);
         }
 
         date_time.setText(long_date_time_format(m.sent_timestamp));
@@ -393,10 +421,10 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         FriendList fl_temp = null;
         try
         {
-            // Log.i(TAG, "have_avatar_for_pubkey:00a01x:" + m.tox_peername + ":" + m.tox_peerpubkey);
+            // Log.i(TAG, "have_avatar_for_pubkey:00a01x:" + message__tox_peername + ":" + message__tox_peerpubkey);
 
             fl_temp = orma.selectFromFriendList().
-                    tox_public_key_stringEq(m.tox_peerpubkey).get(0);
+                    tox_public_key_stringEq(message__tox_peerpubkey).get(0);
 
             if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))
             {
@@ -497,6 +525,9 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             // Log.i(TAG, "have_avatar_for_pubkey:00a07:" + have_avatar_for_pubkey);
         }
 
+        img_corner.setVisibility(View.GONE);
+        date_time.setVisibility(View.VISIBLE);
+
         if (is_system_message)
         {
             img_avatar.setVisibility(View.GONE);
@@ -516,9 +547,16 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         {
             // TODO: do we need to reset here? -> yes
             img_avatar.setVisibility(View.VISIBLE);
-            img_corner.setVisibility(View.VISIBLE);
-            imageView.setVisibility(View.INVISIBLE);
-            textView_container.setMinimumHeight((int) dp2px(50));
+            if (PREF__compact_chatlist)
+            {
+                img_corner.setVisibility(View.GONE);
+            }
+            else
+            {
+                img_corner.setVisibility(View.VISIBLE);
+            }
+            imageView.setVisibility(View.VISIBLE);
+            textView_container.setMinimumHeight((int) dp2px(0));
             textView_container.setPadding(0, textView_container.getPaddingTop(), 0,
                                           textView_container.getPaddingBottom()); // left, top, right, bottom
             LinearLayout.LayoutParams parameter = (LinearLayout.LayoutParams) textView_container.getLayoutParams();
@@ -526,13 +564,146 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                                  parameter.bottomMargin); // left, top, right, bottom
             textView_container.setLayoutParams(parameter);
             // peer_name_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            peer_name_text.setVisibility(View.VISIBLE);
 
             if (!have_avatar_for_pubkey)
             {
                 // Log.i(TAG, "have_avatar_for_pubkey:005+" + have_avatar_for_pubkey);
                 img_avatar.setImageDrawable(smiley_face);
             }
+
+            if (m.was_synced)
+            {
+                // synced from ToxProxy
+                imageView.setImageResource(R.drawable.circle_orange);
+            }
+            else
+            {
+                // received directly
+                imageView.setImageResource(R.drawable.circle_green);
+            }
+
+
+            // --------- peer name (show only if different from previous message) ---------
+            // --------- peer name (show only if different from previous message) ---------
+            // --------- peer name (show only if different from previous message) ---------
+            peer_name_text.setVisibility(View.GONE);
+            int my_position = this.getAdapterPosition();
+            if (my_position != RecyclerView.NO_POSITION)
+            {
+                try
+                {
+                    if (MyMainActivity.conference_message_list_fragment.adapter != null)
+                    {
+                        if (my_position < 1)
+                        {
+                            peer_name_text.setVisibility(View.VISIBLE);
+                        }
+                        else
+                        {
+                            name_test_pk res2 = correct_pubkey(
+                                    MyMainActivity.conference_message_list_fragment.adapter.get_item(my_position));
+
+                            name_test_pk res3 = correct_pubkey(
+                                    MyMainActivity.conference_message_list_fragment.adapter.get_item(my_position - 1));
+
+                            String peer_cur = null;
+                            String peer_prev = null;
+
+                            if (res2.changed)
+                            {
+                                peer_cur = res2.tox_peerpubkey;
+                            }
+                            else
+                            {
+                                peer_cur = MyMainActivity.conference_message_list_fragment.adapter.get_item(
+                                        my_position).tox_peerpubkey;
+                            }
+
+                            if (res3.changed)
+                            {
+                                peer_prev = res3.tox_peerpubkey;
+                            }
+                            else
+                            {
+                                peer_prev = MyMainActivity.conference_message_list_fragment.adapter.get_item(
+                                        my_position - 1).tox_peerpubkey;
+                            }
+
+
+                            if ((peer_cur == null) || (peer_prev == null))
+                            {
+                                peer_name_text.setVisibility(View.VISIBLE);
+                            }
+                            else if (!peer_cur.equals(peer_prev))
+                            {
+                                peer_name_text.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+            // --------- peer name (show only if different from previous message) ---------
+            // --------- peer name (show only if different from previous message) ---------
+            // --------- peer name (show only if different from previous message) ---------
+
+            // --------- timestamp (show only if different from previous message) ---------
+            // --------- timestamp (show only if different from previous message) ---------
+            // --------- timestamp (show only if different from previous message) ---------
+            date_time.setVisibility(View.GONE);
+            if (my_position != RecyclerView.NO_POSITION)
+            {
+                try
+                {
+                    if (MyMainActivity.conference_message_list_fragment.adapter != null)
+                    {
+                        if (my_position < 1)
+                        {
+                            date_time.setVisibility(View.VISIBLE);
+                        }
+                        else
+                        {
+                            final ConferenceMessagelistAdapter.DateTime_in_out peer_cur = MyMainActivity.conference_message_list_fragment.adapter.getDateTime(
+                                    my_position);
+                            final ConferenceMessagelistAdapter.DateTime_in_out peer_prev = MyMainActivity.conference_message_list_fragment.adapter.getDateTime(
+                                    my_position - 1);
+                            if ((peer_cur == null) || (peer_prev == null))
+                            {
+                                date_time.setVisibility(View.VISIBLE);
+                            }
+                            // else if (peer_cur.direction != peer_prev.direction)
+                            // {
+                            //     date_time.setVisibility(View.VISIBLE);
+                            // }
+                            // else if (!peer_cur.pk.equals(peer_prev.pk))
+                            // {
+                            //     date_time.setVisibility(View.VISIBLE);
+                            // }
+                            else
+                            {
+                                // if message is within 20 seconds of previous message and same direction and same peer
+                                // then do not show timestamp
+                                if (peer_cur.timestamp > peer_prev.timestamp + (MESSAGES_TIMEDELTA_NO_TIMESTAMP_MS))
+                                {
+                                    date_time.setVisibility(View.VISIBLE);
+                                }
+                            }
+
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+            else
+            {
+            }
+            // --------- timestamp (show only if different from previous message) ---------
+            // --------- timestamp (show only if different from previous message) ---------
+            // --------- timestamp (show only if different from previous message) ---------
         }
 
     }
@@ -678,4 +849,66 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             return res.ret_value;
         }
     };
+
+    class name_test_pk
+    {
+        boolean changed;
+        String tox_peername;
+        String text;
+        String tox_peerpubkey;
+    }
+
+    name_test_pk correct_pubkey(ConferenceMessage m)
+    {
+        name_test_pk ret = new name_test_pk();
+        ret.changed = false;
+
+        if (m.conference_identifier.equals(TOXIRC_TOKTOK_CONFID))
+        {
+            if (m.tox_peerpubkey.equals(TOXIRC_PUBKEY))
+            {
+                // toxirc messages will be displayed in a special way
+                if (m.text.length() > (3 + 1))
+                {
+                    if (m.text.startsWith("<"))
+                    {
+                        int start_pos = m.text.indexOf("<");
+                        int end_pos = m.text.indexOf("> ");
+
+                        if ((start_pos > -1) && (end_pos > -1) && (end_pos > start_pos))
+                        {
+                            try
+                            {
+                                String peer_name_corrected = m.text.substring(start_pos + 1, end_pos);
+
+                                ret.tox_peername = peer_name_corrected;
+
+                                if (string_is_in_list(peer_name_corrected, PREF__toxirc_muted_peers))
+                                {
+                                    ret.text = "** muted **";
+                                }
+                                else
+                                {
+                                    ret.text = m.text.substring(end_pos + 2);
+                                }
+
+                                String new_fake_pubkey = bytesToHex(TrifaSetPatternActivity.sha256(
+                                        TrifaSetPatternActivity.StringToBytes2(
+                                                m.tox_peerpubkey + "--" + peer_name_corrected)));
+
+                                new_fake_pubkey = new_fake_pubkey.substring(1, new_fake_pubkey.length() - 2);
+                                ret.tox_peerpubkey = new_fake_pubkey;
+                                ret.changed = true;
+                            }
+                            catch (Exception e)
+                            {
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return ret;
+    }
 }

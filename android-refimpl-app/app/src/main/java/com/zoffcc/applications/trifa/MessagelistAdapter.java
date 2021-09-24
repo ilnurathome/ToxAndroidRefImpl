@@ -20,7 +20,6 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,11 +30,19 @@ import com.l4digital.fastscroll.FastScroller;
 import java.util.Iterator;
 import java.util.List;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import static com.zoffcc.applications.trifa.HelperGeneric.only_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 
+/*
+ *
+ * HINT: in this class we decide what type of message/filetransfer view is actually shown
+ *
+ */
 public class MessagelistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
 {
     private static final String TAG = "trifa.MessagelistAdptr";
@@ -66,47 +73,100 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         switch (viewType)
         {
             case Message_model.TEXT_INCOMING_NOT_READ:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent, false);
+                if (PREF__compact_chatlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read_compact,
+                                                                            parent, false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent,
+                                                                            false);
+                }
                 return new MessageListHolder_text_incoming_not_read(view, this.context);
             case Message_model.TEXT_INCOMING_HAVE_READ:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent,
+                                                                        false);
                 // return new MessageListHolder_text_incoming_read___unused___(view, this.context);
                 return new MessageListHolder_error(view, this.context);
 
             case Message_model.TEXT_OUTGOING_NOT_READ:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry, parent, false);
+                if (PREF__compact_chatlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_compact,
+                                                                            parent, false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry, parent,
+                                                                            false);
+                }
                 return new MessageListHolder_text_outgoing_not_read(view, this.context);
             case Message_model.TEXT_OUTGOING_HAVE_READ:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_read, parent, false);
+                if (PREF__compact_chatlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(
+                            R.layout.message_list_self_entry_read_compact, parent, false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_read,
+                                                                            parent, false);
+                }
                 return new MessageListHolder_text_outgoing_read(view, this.context);
 
             case Message_model.FILE_INCOMING_STATE_CANCEL:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent, false);
+                if (PREF__compact_chatlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming_compact,
+                                                                            parent, false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent,
+                                                                            false);
+                }
                 return new MessageListHolder_file_incoming_state_cancel(view, this.context);
             case Message_model.FILE_INCOMING_STATE_PAUSE_HAS_ACCEPTED:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent,
+                                                                        false);
                 return new MessageListHolder_file_incoming_state_pause_has_accepted(view, this.context);
             case Message_model.FILE_INCOMING_STATE_PAUSE_NOT_YET_ACCEPTED:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent,
+                                                                        false);
                 return new MessageListHolder_file_incoming_state_pause_not_yet_accepted(view, this.context);
             case Message_model.FILE_INCOMING_STATE_RESUME:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent,
+                                                                        false);
                 return new MessageListHolder_file_incoming_state_resume(view, this.context);
 
             case Message_model.FILE_OUTGOING_STATE_CANCEL:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent, false);
+                if (PREF__compact_chatlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing_compact,
+                                                                            parent, false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent,
+                                                                            false);
+                }
                 return new MessageListHolder_file_outgoing_state_cancel(view, this.context);
             case Message_model.FILE_OUTGOING_STATE_PAUSE_HAS_ACCEPTED:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent,
+                                                                        false);
                 return new MessageListHolder_file_outgoing_state_pause_has_accepted(view, this.context);
             case Message_model.FILE_OUTGOING_STATE_PAUSE_NOT_YET_ACCEPTED:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent,
+                                                                        false);
                 return new MessageListHolder_file_outgoing_state_pause_not_yet_accepted(view, this.context);
             case Message_model.FILE_OUTGOING_STATE_PAUSE_NOT_YET_STARTED:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent,
+                                                                        false);
                 return new MessageListHolder_file_outgoing_state_pause_not_yet_started(view, this.context);
             case Message_model.FILE_OUTGOING_STATE_RESUME:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent, false);
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent,
+                                                                        false);
                 return new MessageListHolder_file_outgoing_state_resume(view, this.context);
         }
 
@@ -450,7 +510,8 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 else
                 {
                     getSectionText_message_object_ts = getSectionText_message_object.rcvd_timestamp;
-                    getSectionText_message_object_ts_string = "  " + only_date_time_format(getSectionText_message_object.rcvd_timestamp) + "          ";
+                    getSectionText_message_object_ts_string =
+                            "  " + only_date_time_format(getSectionText_message_object.rcvd_timestamp) + "          ";
                     return getSectionText_message_object_ts_string;
                 }
             }
@@ -464,7 +525,8 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 else
                 {
                     getSectionText_message_object_ts = getSectionText_message_object.sent_timestamp;
-                    getSectionText_message_object_ts_string = "  " + only_date_time_format(getSectionText_message_object.sent_timestamp) + "          ";
+                    getSectionText_message_object_ts_string =
+                            "  " + only_date_time_format(getSectionText_message_object.sent_timestamp) + "          ";
                     return getSectionText_message_object_ts_string;
                 }
             }
@@ -492,7 +554,8 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 else
                 {
                     getSectionText_message_object_ts2 = getSectionText_message_object2.rcvd_timestamp;
-                    getSectionText_message_object_ts_string2 = "" + only_date_time_format(getSectionText_message_object2.rcvd_timestamp);
+                    getSectionText_message_object_ts_string2 =
+                            "" + only_date_time_format(getSectionText_message_object2.rcvd_timestamp);
                     return getSectionText_message_object_ts_string2;
                 }
             }
@@ -506,7 +569,8 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 else
                 {
                     getSectionText_message_object_ts2 = getSectionText_message_object2.sent_timestamp;
-                    getSectionText_message_object_ts_string2 = "" + only_date_time_format(getSectionText_message_object2.sent_timestamp);
+                    getSectionText_message_object_ts_string2 =
+                            "" + only_date_time_format(getSectionText_message_object2.sent_timestamp);
                     return getSectionText_message_object_ts_string2;
                 }
             }
@@ -518,5 +582,54 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         }
     }
 
+    public static class DateTime_in_out
+    {
+        long timestamp;
+        int direction;
+    }
 
+    public MessagelistAdapter.DateTime_in_out getDateTime(int position)
+    {
+        MessagelistAdapter.DateTime_in_out ret = new MessagelistAdapter.DateTime_in_out();
+
+        try
+        {
+            // direction: 0 -> msg received, 1 -> msg sent
+            Message getSectionText_message_object2 = messagelistitems.get(position);
+
+            if (getSectionText_message_object2.direction == 0)
+            {
+                // incoming msg
+                ret.direction = 0;
+                if (getSectionText_message_object2.msg_version == 1)
+                {
+                    ret.timestamp = getSectionText_message_object2.sent_timestamp;
+                }
+                else
+                {
+                    ret.timestamp = getSectionText_message_object2.rcvd_timestamp;
+                }
+                return ret;
+            }
+            else
+            {
+                // outgoing msg
+                ret.direction = 1;
+                if (getSectionText_message_object2.msg_version == 1)
+                {
+                    ret.timestamp = getSectionText_message_object2.sent_timestamp;
+                }
+                else
+                {
+                    ret.timestamp = getSectionText_message_object2.sent_timestamp;
+                }
+                return ret;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

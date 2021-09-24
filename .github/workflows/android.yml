@@ -26,12 +26,24 @@ jobs:
         name: trifa
         path: /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug.apk
 
+  gradle-wrapper-validation:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: gradle/wrapper-validation-action@v1
+ 
   android-test:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
     - name: install cliclick
       run:  brew install cliclick
+
+    - name: macos-version1
+      run: sw_vers -productVersion
+
+    - name: macos-version2
+      run: system_profiler SPSoftwareDataType
 
     - name: android test
       uses: reactivecircus/android-emulator-runner@v2
@@ -52,6 +64,7 @@ jobs:
           screencapture -T 45 -x -t png /Users/runner/screen05.png &
           screencapture -T 46 -x -t png /Users/runner/screen06.png &
           screencapture -T 50 -x -t png /Users/runner/screen07.png &
+          screencapture -T 240 -x -t png /Users/runner/screen08.png &
           cd android-refimpl-app ; ./gradlew connectedAndroidTest
 
     - name: upload screenshots

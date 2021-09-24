@@ -29,9 +29,9 @@
     <string name="settings_toolbar_title">Ayarlar</string>
     <string name="pref_header_general">Genel</string>
     <string name="pref_title_auto_accept_image">görüntüleri otomatik kabul et</string>
-    <string name="pref_description_auto_accept_image">6 megabayta kadar olan görüntüleri ve fotoğrafları otomatik olarak kabul et</string>
+    <string name="pref_description_auto_accept_image">boyutu 12 megabayta kadar olan görüntüleri ve fotoğrafları otomatik olarak kabul et</string>
     <string name="pref_title_auto_accept_video">videoları otomatik kabul et</string>
-    <string name="pref_description_auto_accept_video">boyutu 20 megabayta kadar olan videoları otomatik olarak kabul et</string>
+    <string name="pref_description_auto_accept_video">boyutu 40 megabayta kadar olan videoları otomatik olarak kabul et</string>
     <string name="pref_title_video_uv_reversed">Videoda ters UV</string>
     <string name="pref_description_video_uv_reversed">Kamera videosundaki UV düzlemlerinin sırasını ters çevir</string>
     <string name="pref_title_software_echo_cancel">Yankı giderme</string>
@@ -81,7 +81,7 @@
 \nDeğişiklik YENİDEN BAŞLATMA gerektirir!</string>
     <string name="pref_title_fps_half">düşük fps</string>
     <string name="pref_description_fps_half">Video Kare Hızı 1/2: 25fps yerine 12fps</string>
-    <string name="pref_title_set_fps">fps ayarla</string>
+    <string name="pref_title_set_fps">FPS ayarla</string>
     <string name="pref_description_set_fps">15fps video kare hızı ayarlamaya çalış, bu bazı telefonlarda çökebilir</string>
     <string name="pref_title_conference_show_system_messages">Sistem Mesajları</string>
     <string name="pref_description_conference_show_system_messages">Konferanslarda Sistem Mesajlarını Göster</string>
@@ -364,4 +364,32 @@
     <string name="pref_description_start_on_boot">önyüklemeden sonra uygulamayı başlat.
 \nGoogle, Android 10\'dan itibaren artık buna izin vermiyor</string>
     <string name="pref_title_start_on_boot">önyüklemede başlat</string>
+    <string name="pref_description_compact_chatlist">Alandan kazanmak için sohbet listesini daha sıkı bir şekilde görüntüleyin</string>
+    <string name="pref_title_compact_chatlist">Sohbet Listesini Sıkıştır</string>
+    <string name="pref_description_compact_friendlist">Geniş bir arkadaş listeniz varsa, onu daha sıkı hale getirin</string>
+    <string name="pref_title_compact_friendlist">Arkadaş Listesini Sıkıştır</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">şifreli sohbetleri dışa aktar *güvenli değil*</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">şifreli dosyaları dışa aktar *güvenli değil*</string>
+    <string name="pref_description_window_security">Bu ayarın etkinleştirilmesi, Etkinliklere FLAG_SECURE ekler.
+\nEkran görüntülerini, ekran kaydını ve içeriğin son uygulamalar ön izlemesinde gösterilmesini engeller</string>
+    <string name="pref_title_window_security">ekran görüntülerini engelle</string>
+    <string name="pref_description_toxirc_muted_peers_03">Sesi Kapatılan Kullanıcı 3 (kullanılmıyorsa boş bırakın)</string>
+    <string name="pref_description_toxirc_muted_peers_02">Sesi Kapatılan Kullanıcı 2 (kullanılmıyorsa boş bırakın)</string>
+    <string name="pref_description_toxirc_muted_peers_01">Sesi Kapatılan Kullanıcı 1 (kullanılmıyorsa boş bırakın)</string>
+    <string name="pref_title_toxirc_muted_peers_01">Toxirc Köprüsü Sesi Kapatılan Kullanıcılar</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">Dosyaları paylaşma amacı ile TRIFA\'ya paylaşın.</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">Dosyaları paylaş</string>
+    <string name="pref_title_use_push_service">Push Hizmeti Kullan</string>
+    <string name="pref_description_use_push_service">UYARI: Bu, Pil ve Bant genişliğinden tasarruf etmek için Google FCM veya Unified Push kullanacaktır.
+\nUygulama bazı PUSH sunucularına doğrudan HTTPS: bağlantıları yapacaktır (Tox aracılığıyla değil).
+\nBunu yalnızca kabul ediyorsanız etkinleştirin.
+\nBu özellik, Tox Push Mesajı Uygulamasının kurulu olmasını gerektirir.</string>
+    <string name="layout___own_pushurl">Push URL\'si:</string>
+    <string name="layout___remove_own_pushurl">Push URL\'sini kaldır</string>
+    <string name="layout___friends_pushurl">Arkadaşlar Push URL\'si:</string>
+    <string name="layout___remove_friends_pushurl">Arkadaşlar Push URL\'sini kaldır</string>
+    <string name="pref_title_download_push_msg_app">Push Mesajı Uygulamasını İndir</string>
+    <string name="layout___conf_title">Başlık:</string>
+    <string name="layout___conf_id">Konferans kimliği:</string>
+    <string name="title_activity_conferenceinfo">Konferans bilgisi</string>
 </resources>

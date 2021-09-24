@@ -24,18 +24,22 @@ import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Messenger;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -46,6 +50,8 @@ import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -54,6 +60,7 @@ import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -62,7 +69,6 @@ import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.blue;
 import static android.graphics.Color.green;
 import static android.graphics.Color.red;
-import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_encoder;
 import static com.zoffcc.applications.trifa.CallingActivity.fetch_from_h264_encoder;
@@ -72,6 +78,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x
 import static com.zoffcc.applications.trifa.CallingActivity.set_vdelay_every_x_frames;
 import static com.zoffcc.applications.trifa.CallingActivity.set_vdelay_every_x_frames_current;
 import static com.zoffcc.applications.trifa.Callstate.java_video_encoder_first_frame_in;
+import static com.zoffcc.applications.trifa.HelperFriend.friend_call_push_url;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
@@ -79,6 +86,7 @@ import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.MainService.MSG_PUB;
@@ -93,6 +101,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_H264;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fis_saf;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timestamp;
@@ -117,6 +127,9 @@ public class HelperGeneric
 
     private static final String TAG = "trifa.Hlp.Generic";
 
+    private static final Pattern PATTERN_IPV4 = Pattern.compile(
+            "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+
     static long video_frame_age_mean = 0;
     static int video_frame_age_values_cur_index = 0;
     final static int video_frame_age_values_cur_index_count = 10;
@@ -135,7 +148,7 @@ public class HelperGeneric
             {
                 try
                 {
-                    clearCache(MainActivity.context_s);
+                    clearCache(context_s);
                 }
                 catch (Exception e)
                 {
@@ -316,7 +329,7 @@ public class HelperGeneric
         }
     }
 
-    static void conference_message_add_from_sync(long conference_number, long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms)
+    static void conference_message_add_from_sync(long conference_number, long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms, String message_id)
     {
         // Log.i(TAG, "conference_message_add_from_sync:cf_num=" + conference_number + " pnum=" + peer_number2 + " msg=" +
         //            message);
@@ -397,6 +410,7 @@ public class HelperGeneric
         m.sent_timestamp = sent_timestamp_in_ms;
         m.rcvd_timestamp = System.currentTimeMillis();
         m.text = message;
+        m.message_id_tox = message_id;
         m.was_synced = true;
 
         try
@@ -593,7 +607,7 @@ public class HelperGeneric
 
                                     if (filenum < 0)
                                     {
-                                        Log.i(TAG, "Send own Avatar: error " + filenum);
+                                        Log.i(TAG, "Send_own_Avatar: error " + filenum);
                                         return;
                                     }
 
@@ -932,7 +946,7 @@ public class HelperGeneric
                 {
                     is = new info.guardianproject.iocipher.FileInputStream(f_real);
                     os = new java.io.FileOutputStream(f2);
-                    byte[] buffer = new byte[1024];
+                    byte[] buffer = new byte[8192];
                     int length;
 
                     while ((length = is.read(buffer)) > 0)
@@ -970,11 +984,16 @@ public class HelperGeneric
                 info.guardianproject.iocipher.FileInputStream is = null;
                 java.io.FileOutputStream os = null;
 
+                if (!f_real.exists())
+                {
+                    return;
+                }
+
                 try
                 {
                     is = new info.guardianproject.iocipher.FileInputStream(f_real);
                     os = new java.io.FileOutputStream(f2);
-                    byte[] buffer = new byte[1024];
+                    byte[] buffer = new byte[8192];
                     int length;
 
                     while ((length = is.read(buffer)) > 0)
@@ -1193,8 +1212,7 @@ public class HelperGeneric
             }
             catch (android.database.sqlite.SQLiteConstraintException | net.sqlcipher.database.SQLiteConstraintException e)
             {
-                e.printStackTrace();
-
+                // e.printStackTrace();
                 try
                 {
                     orma.updateTRIFADatabaseGlobalsNew().keyEq(key).value(value).execute();
@@ -1574,6 +1592,19 @@ public class HelperGeneric
         }
     }
 
+    static String long_date_time_format_for_filename(long timestamp_in_millis)
+    {
+        try
+        {
+            return MainActivity.df_date_time_long_for_filename.format(new Date(timestamp_in_millis));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return "_Datetime_ERROR_";
+        }
+    }
+
     static String long_date_time_format_or_empty(long timestamp_in_millis)
     {
         try
@@ -1656,58 +1687,127 @@ public class HelperGeneric
         }
     }
 
-    static byte[] read_chunk_from_SD_file(String file_name_with_path, long position, long file_chunk_length)
+    static byte[] read_chunk_from_SD_file(String file_name_with_path, long position, long file_chunk_length, boolean real_file_path)
     {
         byte[] out = new byte[(int) file_chunk_length];
 
-        try
+        if (real_file_path)
         {
-            RandomAccessFile raf = new RandomAccessFile(file_name_with_path, "r");
-            FileChannel inChannel = raf.getChannel();
-            MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, position, file_chunk_length);
-
-            // Log.i(TAG, "read_chunk_from_SD_file:" + buffer.limit() + " <-> " + file_chunk_length);
-
-            for (int i = 0; i < buffer.limit(); i++)
-            {
-                out[i] = buffer.get();
-            }
-
             try
             {
-                inChannel.close();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+                RandomAccessFile raf = new RandomAccessFile(file_name_with_path, "r");
+                FileChannel inChannel = raf.getChannel();
+                MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, position, file_chunk_length);
 
-            try
-            {
-                raf.close();
+                // Log.i(TAG, "read_chunk_from_SD_file:" + buffer.limit() + " <-> " + file_chunk_length);
+
+                for (int i = 0; i < buffer.limit(); i++)
+                {
+                    out[i] = buffer.get();
+                }
+
+                try
+                {
+                    inChannel.close();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    raf.close();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
             catch (Exception e)
             {
                 e.printStackTrace();
             }
         }
-        catch (Exception e)
+        else
         {
-            e.printStackTrace();
+            try
+            {
+                PositionInputStream fis = cache_ft_fis_saf.get(file_name_with_path);
+                if (fis == null)
+                {
+                    InputStream fis_regular = context_s.getContentResolver().openInputStream(
+                            Uri.parse(file_name_with_path));
+                    fis = new PositionInputStream(fis_regular);
+                    if (fis != null)
+                    {
+                        try
+                        {
+                            cache_ft_fis_saf.remove(file_name_with_path);
+                        }
+                        catch (Exception e)
+                        {
+                        }
+                        cache_ft_fis_saf.put(file_name_with_path, fis);
+                    }
+
+                    long actually_skipped = fis.skip(position);
+                    if (actually_skipped != position)
+                    {
+                        Log.i(TAG, "can NOT read check at position:" + position + " got pos=" + actually_skipped);
+                    }
+                }
+                else
+                {
+                    if (fis.getPosition() < position)
+                    {
+                        fis.skip(position - fis.getPosition());
+                    }
+                    else
+                    {
+                        if (fis.getPosition() > position)
+                        {
+                            fis.close();
+                            cache_ft_fis_saf.remove(file_name_with_path);
+                            InputStream fis_regular = context_s.getContentResolver().openInputStream(
+                                    Uri.parse(file_name_with_path));
+                            fis = new PositionInputStream(fis_regular);
+                            if (fis != null)
+                            {
+                                cache_ft_fis_saf.put(file_name_with_path, fis);
+                            }
+
+                            long actually_skipped = fis.skip(position);
+                            if (actually_skipped != position)
+                            {
+                                Log.i(TAG,
+                                      "can NOT read check at position:" + position + " got pos=" + actually_skipped);
+                            }
+                        }
+                    }
+                }
+
+                fis.read(out, 0, (int) file_chunk_length);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
 
         return out;
     }
 
-    static void write_chunk_to_VFS_file(String file_name_with_path, long position, long file_chunk_length, ByteBuffer data)
+    static void write_chunk_to_VFS_file(String file_name_with_path, long position, long file_chunk_length, final byte[] data)
     {
         try
         {
+            final ByteBuffer data_bb = ByteBuffer.wrap(data);
             info.guardianproject.iocipher.RandomAccessFile raf = new info.guardianproject.iocipher.RandomAccessFile(
                     file_name_with_path, "rw");
             info.guardianproject.iocipher.IOCipherFileChannel inChannel = raf.getChannel();
             // inChannel.lseek(position, OsConstants.SEEK_SET);
-            inChannel.write(data, position);
+            inChannel.write(data_bb, position);
 
             try
             {
@@ -1733,34 +1833,51 @@ public class HelperGeneric
         }
     }
 
-    static String fileExt(String url)
+    static void Xwrite_chunk_to_VFS_file(String file_name_with_path, final long position, long file_chunk_length, final byte[] data)
     {
-        return getFileExtensionFromUrl(url);
-        //        if (url.indexOf("?") > -1)
-        //        {
-        //            url = url.substring(0, url.indexOf("?"));
-        //        }
-        //
-        //        if (url.lastIndexOf(".") == -1)
-        //        {
-        //            return null;
-        //        }
-        //        else
-        //        {
-        //            String ext = url.substring(url.lastIndexOf(".") + 1);
-        //
-        //            if (ext.indexOf("%") > -1)
-        //            {
-        //                ext = ext.substring(0, ext.indexOf("%"));
-        //            }
-        //
-        //            if (ext.indexOf("/") > -1)
-        //            {
-        //                ext = ext.substring(0, ext.indexOf("/"));
-        //            }
-        //
-        //            return ext.toLowerCase();
-        //        }
+        try
+        {
+            BufferedOutputStreamCustom fos = cache_ft_fos.get(file_name_with_path);
+            if (fos == null)
+            {
+                // Log.i(TAG, "write_chunk_to_VFS_file:cache:fail");
+                fos = new BufferedOutputStreamCustom(file_name_with_path);
+                try
+                {
+                    cache_ft_fos.remove(file_name_with_path);
+                }
+                catch (Exception e)
+                {
+                }
+                cache_ft_fos.put(file_name_with_path, fos);
+            }
+            else
+            {
+                // Log.i(TAG,"write_chunk_to_VFS_file:cache:HIT");
+            }
+
+            // Log.i(TAG, "write_chunk_to_VFS_file:write:pos=" + position + " len=" + file_chunk_length);
+            fos.seek(position);
+            fos.write(data);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static String get_fileExt(final String filename)
+    {
+        try
+        {
+
+            final Uri f = Uri.fromFile(new File(filename));
+            return MimeTypeMap.getFileExtensionFromUrl(f.toString());
+        }
+        catch (Exception e)
+        {
+            return "";
+        }
     }
 
     static int hash_to_bucket(String hash_value, int number_of_buckets)
@@ -1909,6 +2026,7 @@ public class HelperGeneric
                         (relay_con_status != TOX_CONNECTION_NONE.value))
                     {
                         // if one of them is online, return combined "online" as status
+                        // TODO: do not always return TCP, make this better
                         ret = TOX_CONNECTION_TCP.value;
                     }
                 }
@@ -1921,14 +2039,14 @@ public class HelperGeneric
     /*************************************************************************/
     public static MainActivity.send_message_result tox_friend_send_message_wrapper(long friendnum, int a_TOX_MESSAGE_TYPE, @NonNull String message)
     {
-        Log.d(TAG, "tox_friend_send_message_wrapper:" + friendnum);
+        // Log.d(TAG, "tox_friend_send_message_wrapper:" + friendnum);
         long friendnum_to_use = friendnum;
         FriendList f = main_get_friend(friendnum);
-        Log.d(TAG, "tox_friend_send_message_wrapper:f=" + f);
+        // Log.d(TAG, "tox_friend_send_message_wrapper:f=" + f);
 
         if (f != null)
         {
-            Log.d(TAG, "tox_friend_send_message_wrapper:f conn" + f.TOX_CONNECTION_real);
+            // Log.d(TAG, "tox_friend_send_message_wrapper:f conn" + f.TOX_CONNECTION_real);
 
             if (f.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
             {
@@ -1938,7 +2056,11 @@ public class HelperGeneric
                 {
                     // friend has a relay
                     friendnum_to_use = tox_friend_by_public_key__wrapper(relay_pubkey);
-                    Log.d(TAG, "tox_friend_send_message_wrapper:friendnum_to_use=" + friendnum_to_use);
+                    // Log.d(TAG, "tox_friend_send_message_wrapper:friendnum_to_use=" + friendnum_to_use);
+                }
+                else // if friend is NOT online and does not have a relay, try if he has a push url
+                {
+                    friend_call_push_url(f.tox_public_key_string);
                 }
             }
         }
@@ -1957,7 +2079,7 @@ public class HelperGeneric
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:002:*PING*");
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
-        Log.d(TAG, "tox_friend_send_message_wrapper:res=" + res);
+        // Log.d(TAG, "tox_friend_send_message_wrapper:res=" + res);
         int raw_message_length_int = raw_message_length_buf.
                 array()[raw_message_length_buf.arrayOffset()] & 0xFF + (raw_message_length_buf.
                 array()[raw_message_length_buf.arrayOffset() + 1] & 0xFF) * 256;
@@ -1973,8 +2095,8 @@ public class HelperGeneric
             result.msg_hash_hex = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(), msg_id_buffer.limit());
             result.raw_message_buf_hex = bytesToHex(raw_message_buf.array(), raw_message_buf.arrayOffset(),
                                                     raw_message_length_int);
-            Log.i(TAG, "tox_friend_send_message_wrapper:hash_hex=" + result.msg_hash_hex + " raw_msg_hex" +
-                       result.raw_message_buf_hex);
+            // Log.i(TAG, "tox_friend_send_message_wrapper:hash_hex=" + result.msg_hash_hex + " raw_msg_hex" +
+            //           result.raw_message_buf_hex);
             return result;
         }
         else if (res == -9991)
@@ -2177,12 +2299,15 @@ public class HelperGeneric
                     HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(
                     msg_id_as_hex_string).count();
 
+            long pin_timestamp = System.currentTimeMillis();
+
             if (already_have_message > 0)
             {
                 // it's a double send, ignore it
                 // send message receipt v2, most likely the other party did not get it yet
                 // TODO: use received timstamp, not "now" here!
-                HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer);
+                HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer,
+                                                                (pin_timestamp / 1000));
                 return;
             }
 
@@ -2209,9 +2334,10 @@ public class HelperGeneric
             m.state = TOX_FILE_CONTROL_RESUME.value;
             m.ft_accepted = false;
             m.ft_outgoing_started = false;
+            m.ft_outgoing_queued = false;
             m.sent_timestamp = (ts_sec * 1000); // sent time as unix timestamp -> convert to milliseconds
             m.sent_timestamp_ms = ts_ms; // "ms" part of timestamp (could be just an increasing number)
-            m.rcvd_timestamp = System.currentTimeMillis();
+            m.rcvd_timestamp = pin_timestamp;
             m.rcvd_timestamp_ms = 0;
             m.text = friend_message_text_utf8;
             m.msg_version = 1;
@@ -2234,7 +2360,8 @@ public class HelperGeneric
                 HelperMessage.insert_into_message_db(m, false);
             }
 
-            HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer);
+            HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer,
+                                                            (pin_timestamp / 1000));
 
             try
             {
@@ -2296,11 +2423,17 @@ public class HelperGeneric
                     HelperFriend.tox_friend_get_public_key__wrapper(friend_number_real_sender)).and().msg_id_hashEq(
                     msg_id_as_hex_string).count();
 
+            long pin_timestamp = System.currentTimeMillis();
+
             if (already_have_message > 0)
             {
                 // it's a double send, ignore it
                 // send message receipt v2, most likely the other party did not get it yet
-                HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer);
+                // Log.i(TAG,
+                //      "receive_incoming_message:ACK1:" + get_friend_name_from_num(friend_number_real_sender) + " " +
+                //      msg_id_as_hex_string);
+                HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer,
+                                                                (pin_timestamp / 1000));
                 return;
             }
 
@@ -2327,9 +2460,10 @@ public class HelperGeneric
             m.state = TOX_FILE_CONTROL_RESUME.value;
             m.ft_accepted = false;
             m.ft_outgoing_started = false;
+            m.ft_outgoing_queued = false;
             m.sent_timestamp = (ts_sec * 1000); // sent time as unix timestamp -> convert to milliseconds
             m.sent_timestamp_ms = ts_ms; // "ms" part of timestamp (could be just an increasing number)
-            m.rcvd_timestamp = System.currentTimeMillis();
+            m.rcvd_timestamp = pin_timestamp;
             m.rcvd_timestamp_ms = 0;
             m.text = friend_message_text_utf8;
             m.msg_version = 1;
@@ -2354,7 +2488,10 @@ public class HelperGeneric
             }
 
             // send message receipt v2 to the relay
-            HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer);
+            // Log.i(TAG, "receive_incoming_message:ACK2:" + get_friend_name_from_num(friend_number_real_sender) + " " +
+            //           msg_id_as_hex_string);
+            HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer,
+                                                            (pin_timestamp / 1000));
 
             try
             {
@@ -2844,24 +2981,28 @@ public class HelperGeneric
                 // SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
                 //settings.edit().putString("DB_secrect_key", "").commit();
                 // -----------------------------------------
+                //
+                //
+                // -----------------------------------------
                 // wipe database
                 String dbs_path = context.getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
-                File f_dbs = new File(dbs_path);
-                f_dbs.delete();
+                //File f_dbs = new File(dbs_path);
+                //f_dbs.delete();
                 // wipe encrypted filesystem
                 String encfs_path = context.getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
-                File encfs_dbs = new File(encfs_path);
-                encfs_dbs.delete();
+                //File encfs_dbs = new File(encfs_path);
+                //encfs_dbs.delete();
                 //
                 String encfs_path2 =
                         context.getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME + "-shm";
-                File encfs_dbs2 = new File(encfs_path2);
-                encfs_dbs2.delete();
+                //File encfs_dbs2 = new File(encfs_path2);
+                //encfs_dbs2.delete();
                 //
                 String encfs_path3 =
                         context.getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME + "-wal";
-                File encfs_dbs3 = new File(encfs_path3);
-                encfs_dbs3.delete();
+                //File encfs_dbs3 = new File(encfs_path3);
+                //encfs_dbs3.delete();
+                // -----------------------------------------
                 //
                 // after importing the file. just stop the app hard
                 // tox_service_fg.stop_me(true);
@@ -3093,5 +3234,142 @@ public class HelperGeneric
         }
 
         return sql_like_pattern;
+    }
+
+    static void print_stack_trace()
+    {
+        try
+        {
+            StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+            for (int i = 3; i < elements.length; i++)
+            {
+                StackTraceElement s = elements[i];
+                Log.i("STACK_TRACE:",
+                      "STACK_TRACE:\tat " + s.getClassName() + "." + s.getMethodName() + "(" + s.getFileName() + ":" +
+                      s.getLineNumber() + ")");
+            }
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
+    static void draw_main_top_icon__real(ImageView view, Context c, int blur_color, boolean is_fg)
+    {
+        try
+        {
+            view.setBackgroundColor(Color.TRANSPARENT);
+
+            Drawable d = c.getResources().getDrawable(R.drawable.web_hi_res_512);
+            Drawable currentState = d.getCurrent();
+            if (currentState instanceof BitmapDrawable)
+            {
+                Bitmap bm1 = ((BitmapDrawable) currentState).getBitmap();
+                Bitmap bm = bm1.copy(bm1.getConfig(), true);
+
+                Bitmap alpha = bm.extractAlpha();
+                BlurMaskFilter blurMaskFilter = new BlurMaskFilter(35, BlurMaskFilter.Blur.OUTER);
+
+                Paint paint = new Paint();
+                paint.setMaskFilter(blurMaskFilter);
+                paint.setColor(blur_color);
+
+                Canvas canvas = new Canvas(bm);
+                canvas.drawBitmap(alpha, 0, 0, paint);
+
+                view.setImageBitmap(bm);
+            }
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
+    static void draw_main_top_icon(ImageView view, Context c, int blur_color, boolean is_fg)
+    {
+        try
+        {
+            if (!is_fg)
+            {
+                Runnable myRunnable = () -> {
+                    try
+                    {
+                        draw_main_top_icon__real(view, c, blur_color, is_fg);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                };
+
+                try
+                {
+                    if (MainActivity.main_handler_s != null)
+                    {
+                        MainActivity.main_handler_s.post(myRunnable);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
+                draw_main_top_icon__real(view, c, blur_color, is_fg);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void touch(File file) throws IOException
+    {
+        if (!file.exists())
+        {
+            File parent = file.getParentFile();
+            if (parent != null)
+            {
+                if (!parent.exists())
+                {
+                    if (!parent.mkdirs())
+                    {
+                        throw new IOException("Cannot create parent directories for file: " + file);
+                    }
+                }
+            }
+            file.createNewFile();
+        }
+
+        boolean success = file.setLastModified(System.currentTimeMillis());
+        if (!success)
+        {
+            throw new IOException("Unable to set the last modification time for " + file);
+        }
+    }
+
+    public static boolean string_is_in_list(String input, String[] list)
+    {
+        try
+        {
+            return (Arrays.asList(list).contains(input));
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+
+    public static boolean validate_ipv4(final String ip)
+    {
+        try
+        {
+            return PATTERN_IPV4.matcher(ip).matches();
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
     }
 }

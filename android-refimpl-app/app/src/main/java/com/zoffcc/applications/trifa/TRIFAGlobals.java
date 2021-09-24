@@ -42,23 +42,30 @@ public class TRIFAGlobals
     static String global_notification_token = null;
     final static String NOTIFICATION_TOKEN_DB_KEY = "NotificationToken";
     final static String NOTIFICATION_TOKEN_DB_KEY_NEED_ACK = "NotificationTokenNeedACK";
+    final static String NOTIFICATION_FCM_PUSH_URL_PREFIX = "https://tox.zoff.xyz/toxfcm/fcm.php?id=";
+    final static String NOTIFICATION_FCM_PUSH_URL_PREFIX_OLD = "https://toxcon2020.zoff.cc/toxfcm/fcm.php?id=";
+    final static String NOTIFICATION_UP_PUSH_URL_PREFIX = "https://gotify1.unifiedpush.org/UP?token=";
+
+    final static String TOX_PUSH_MSG_APP = "https://github.com/zoff99/tox_push_msg_app/releases/latest/download/play.pushmsg.apk";
 
     final static String FRIEND_AVATAR_FILENAME = "_____xyz____avatar.png";
 
     static boolean HAVE_INTERNET_CONNECTIVITY = true;
     final static int TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS =
             1000 * 60 * 2; // bootstrap again after 2 minutes offline
-    final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = false;
     final static int SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE = 120; // x secs.
     static long BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = 15 * 1000 * 60; // 15 minutes default
     static int BATTERY_OPTIMIZATION_LAST_SLEEP1 = -1;
     static int BATTERY_OPTIMIZATION_LAST_SLEEP2 = -1;
     static int BATTERY_OPTIMIZATION_LAST_SLEEP3 = -1;
 
+    static int AUTO_ACCEPT_FT_MAX_IMAGE_SIZE_IN_MB = 12;
+    static int AUTO_ACCEPT_FT_MAX_VIDEO_SIZE_IN_MB = 40;
+    static int AUTO_ACCEPT_FT_MAX_ANYKIND_SIZE_IN_MB = 200;
+
     public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
     public static final int CONFERENCE_COOKIE_LENGTH = 35;
     public static final int CONFERENCE_ID_LENGTH = 32;
-    public static final int DELAY_SENDING_FRIEND_RECEIPT_TO_RELAY_MS = 4 * 1000; // 4 sec.
 
     public static final String TEXT_QUOTE_STRING_1 = "----\n";
     public static final String TEXT_QUOTE_STRING_2 = "\n----";
@@ -67,6 +74,8 @@ public class TRIFAGlobals
     // https://toxme.io/u/echobot
     //  echobot@toxme.io
     final static String ECHOBOT_TOXID = "76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A235342C48A39218F515C39A6";
+    final static String TOXIRC_TOKTOK_CONFID = "b0d5292414685a53341d8126b67dfe260baf5881c9aff48a6ea211dcf3bfe34f";
+    final static String TOXIRC_PUBKEY = "A922A51E1C91205B9F7992E2273107D47C72E8AE909C61C28A77A4A2A115431B";
     // ----------
 
     final static boolean ADD_BOTS_ON_STARTUP = true;
@@ -158,8 +167,10 @@ public class TRIFAGlobals
     static final int USE_MAX_NUMBER_OF_BOOTSTRAP_TCP_RELAYS = 10;
 
     // ---- lookup cache ----
-    static Map<String, info.guardianproject.iocipher.FileOutputStream> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.FileOutputStream>();
-    static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();
+    // static Map<String, info.guardianproject.iocipher.RandomAccessFile> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.RandomAccessFile>();
+    static Map<String, BufferedOutputStreamCustom> cache_ft_fos = new HashMap<String, BufferedOutputStreamCustom>();
+    // static Map<String, java.io.FileOutputStream> cache_ft_fos_normal = new HashMap<String, java.io.FileOutputStream>();
+    static Map<String, PositionInputStream> cache_ft_fis_saf = new HashMap<String, PositionInputStream>();
     // ---- lookup cache ----
 
     static List<BootstrapNodeEntryDB> bootstrap_node_list = new ArrayList<>();
@@ -167,12 +178,15 @@ public class TRIFAGlobals
 
     static final int[] MESSAGE_TEXT_SIZE = {9, 11, 15, 20}; // values in "sp"
     static final int[] MESSAGE_EMOJI_SIZE = {13, 18, 25, 36}; // values in "dp"
+    static final int MESSAGE_TEXT_SIZE_FT_SMALL = 12;
+    static final int MESSAGE_TEXT_SIZE_FT_NORMAL = 13;
     static final int[] MESSAGE_EMOJI_ONLY_EMOJI_SIZE = {13 * 2, 18 * 2, 25 * 2, 36 * 2}; // values in "dp"
 
     static long LAST_ONLINE_TIMSTAMP_ONLINE_NOW = Long.MAX_VALUE - 1;
     static long LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE = -1;
 
     static long ONE_HOUR_IN_MS = 3600 * 1000;
+    static int MESSAGES_TIMEDELTA_NO_TIMESTAMP_MS = 30 * 1000;
 
     static int CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX = 10;
     static int CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX = 20;
@@ -210,7 +224,8 @@ public class TRIFAGlobals
     {
         CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY(175), CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND(
             176), CONTROL_PROXY_MESSAGE_TYPE_ALL_MESSAGES_SENT(177), CONTROL_PROXY_MESSAGE_TYPE_PROXY_KILLSWITCH(
-            178), CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN(179);
+            178), CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN(179), CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND(
+            181);
 
         public int value;
 

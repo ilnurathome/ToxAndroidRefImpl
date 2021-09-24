@@ -68,7 +68,11 @@ import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_new_random_nospam_value;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_pubkey;
+import static com.zoffcc.applications.trifa.HelperRelay.have_own_pushurl;
 import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
+import static com.zoffcc.applications.trifa.HelperRelay.own_push_token_load;
+import static com.zoffcc.applications.trifa.HelperRelay.push_token_to_push_url;
+import static com.zoffcc.applications.trifa.HelperRelay.remove_own_pushurl_in_db;
 import static com.zoffcc.applications.trifa.HelperRelay.remove_own_relay_in_db;
 import static com.zoffcc.applications.trifa.Identicon.IDENTICON_ROWS;
 import static com.zoffcc.applications.trifa.MainActivity.clipboard;
@@ -97,7 +101,11 @@ public class ProfileActivity extends AppCompatActivity
     Button new_nospam_button = null;
     Button copy_toxid_button = null;
     Button remove_own_relay_button = null;
+    Button remove_own_pushurl_button = null;
     TextView my_relay_toxid_textview = null;
+    TextView my_relay_toxid_text = null;
+    TextView my_pushurl_textview = null;
+    TextView my_pushurl_text = null;
     ImageView my_identicon_imageview = null;
     TextView mytox_network_connections = null;
 
@@ -121,6 +129,10 @@ public class ProfileActivity extends AppCompatActivity
         new_nospam_button = findViewById(R.id.new_nospam_button);
         remove_own_relay_button = findViewById(R.id.remove_relay_button);
         my_relay_toxid_textview = findViewById(R.id.my_relay_toxid_textview);
+        my_relay_toxid_text = findViewById(R.id.my_relay_toxid_text);
+        remove_own_pushurl_button = findViewById(R.id.remove_own_pushurl_button);
+        my_pushurl_textview = findViewById(R.id.my_pushurl_textview);
+        my_pushurl_text = findViewById(R.id.my_pushurl_text);
         copy_toxid_button = findViewById(R.id.copy_toxid_button);
 
         mytox_network_connections = findViewById(R.id.mytox_network_connections);
@@ -147,9 +159,12 @@ public class ProfileActivity extends AppCompatActivity
             }
         });
 
+        my_relay_toxid_text.setVisibility(View.GONE);
+
         if (have_own_relay())
         {
-            remove_own_relay_button.setText("remove own Relay");
+            my_relay_toxid_text.setVisibility(View.VISIBLE);
+
             remove_own_relay_button.setOnClickListener(new View.OnClickListener()
             {
                 @Override
@@ -205,7 +220,6 @@ public class ProfileActivity extends AppCompatActivity
         }
         else
         {
-            remove_own_relay_button.setText("- no Relay set -");
             remove_own_relay_button.setVisibility(View.INVISIBLE);
             try
             {
@@ -223,6 +237,60 @@ public class ProfileActivity extends AppCompatActivity
             }
             catch (Exception e1)
             {
+            }
+        }
+
+        remove_own_pushurl_button.setVisibility(View.GONE);
+        my_pushurl_textview.setVisibility(View.GONE);
+        my_pushurl_text.setVisibility(View.GONE);
+
+        if (have_own_pushurl())
+        {
+            own_push_token_load();
+            remove_own_pushurl_button.setVisibility(View.VISIBLE);
+
+            remove_own_pushurl_button.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    try
+                    {
+                        remove_own_pushurl_in_db();
+
+                        my_pushurl_textview.setVisibility(View.INVISIBLE);
+                        remove_own_pushurl_button.setVisibility(View.INVISIBLE);
+
+                        try
+                        {
+                            remove_own_pushurl_button.setVisibility(View.GONE);
+                        }
+                        catch (Exception e1)
+                        {
+                        }
+
+                        try
+                        {
+                            my_pushurl_textview.setVisibility(View.GONE);
+                        }
+                        catch (Exception e1)
+                        {
+                        }
+
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            final String push_url_temp = push_token_to_push_url(TRIFAGlobals.global_notification_token);
+            if (push_url_temp != null)
+            {
+                my_pushurl_textview.setText(push_url_temp);
+                my_pushurl_textview.setVisibility(View.VISIBLE);
+                my_pushurl_text.setVisibility(View.VISIBLE);
             }
         }
 

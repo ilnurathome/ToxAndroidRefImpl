@@ -165,7 +165,7 @@
     <string name="pref_title_fps_half">Mažiau kps (kadrų per sekundę)</string>
     <string name="pref_description_orbot_enabled">Norint naudoti, privalote įdiegti Orbot.
 \nPokyčiui pritaikyti reikia PALEISTI IŠ NAUJO!</string>
-    <string name="pref_title_orbot_enabled">Leisti Tor Tarpininkavimą</string>
+    <string name="pref_title_orbot_enabled">Leisti Tor tarpininkavimą</string>
     <string name="pref_title_udp_enabled">Leisti UDP</string>
     <string name="pref_description_higher_audio_quality">Naudoti geresnę garso kokybę.
 \nPokyčiui pritaikyti būtina PALEISTI IŠ NAUJO!</string>
@@ -182,9 +182,9 @@
     <string name="pref_title_higher_video_quality">Vaizdo kokybė</string>
     <string name="pref_description_software_echo_cancel">Naudoti programinės įrangos aido blokavimą</string>
     <string name="pref_title_software_echo_cancel">Aido blokavimas</string>
-    <string name="pref_description_auto_accept_video">Automatiškai priimti vaizdo įrašus iki 10 MBaitų dydžio</string>
+    <string name="pref_description_auto_accept_video">Automatiškai priimti vaizdo įrašus iki 40 MBaitų dydžio</string>
     <string name="pref_title_auto_accept_video">Automatiškai priimti vaizdo įrašus</string>
-    <string name="pref_description_auto_accept_image">Automatiškai priimti paveikslėlius ir nuotraukas iki 3MBaitų dydžio</string>
+    <string name="pref_description_auto_accept_image">Automatiškai priimti paveikslėlius ir nuotraukas iki 12 MBaitų dydžio</string>
     <string name="pref_title_auto_accept_image">Automatiškai priimti paveikslėlius</string>
     <string name="pref_header_general">Bendri</string>
     <string name="settings_toolbar_title">Nustatymai</string>
@@ -204,4 +204,46 @@
     <string name="conference_message_list_activity_name">Rašytinė konferencija</string>
     <string name="message_list_activity_name">Pokalbis</string>
     <string name="add_friend_activity_name">Pridėti draugą</string>
+    <string name="title_activity_wrong_credentials">Neteisingi įgaliojimai</string>
+    <string name="wrong_credentials_error">Neteisingi įgaliojimai</string>
+    <string name="layout___migdb_text">Duomenų bazės failų perkėlimas</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">eksportuoti šifruotus susirašinėjimus *nesaugu*</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">eksportuoti šifruotus failus *nesaugu*</string>
+    <string name="layout___iobrowser_start">naršyti užšifruotą saugyklą</string>
+    <string name="MainActivity_new_noti_token_dialog_text">Gautas naujas pranešimo Token. Naudoti šį Token\?</string>
+    <string name="MainActivity_new_noti_token_dialog_title">Token</string>
+    <string name="pref_description_toxirc_muted_peers_03">Nutildytas vartotojas 3 (palikite tuščią, jei nenaudojama)</string>
+    <string name="pref_description_toxirc_muted_peers_02">Nutildytas vartotojas 2 (palikite tuščią, jei nenaudojama)</string>
+    <string name="pref_description_toxirc_muted_peers_01">Nutildytas vartotojas 1 (palikite tuščią, jei nenaudojama)</string>
+    <string name="pref_title_toxirc_muted_peers_01">Toxirc Bridge nutildyti vartotojai</string>
+    <string name="pref_description_compact_chatlist">Pateikite susirašinėjimus kompaktiškiau taupydami vietą</string>
+    <string name="pref_title_compact_chatlist">Suglaudinti susirašinėjimų sąrašą</string>
+    <string name="pref_description_compact_friendlist">Padarykite draugų sąrašą kompaktiškesnį, jei turite didelį jų sąrašą</string>
+    <string name="pref_title_compact_friendlist">Suglaudinti draugų sąrašą</string>
+    <string name="pref_description_window_security">Įgalinus šį nustatymą, prie veiklų bus pridėta FLAG_SECURE.
+\nTai apsaugos nuo ekrano nuotraukų darymo, ekrano vaizdo įrašinėjimo bei turinio rodymo \"Naujausieji\" peržiūroje</string>
+    <string name="pref_title_window_security">neleisti daryti ekrano nuotraukų</string>
+    <string name="pref_description_start_on_boot">startuoti aplikaciją po įrenginio paleidimo.
+\nGoogle to nebeleidžia pradedant nuo Android 10</string>
+    <string name="pref_title_start_on_boot">startuoti paleidus įrenginį</string>
+    <string name="layout___migdb_do_not_close">NEUŽDARYKITE šio ekrano</string>
+    <string name="messages_search_default_text">ieškoti ...</string>
+    <string name="MainActivity_yes_button">taip</string>
+    <string name="pref_description_auto_accept_all_upto">Automatiškai priimti visus failus iki 200 MBaitų dydžio</string>
+    <string name="pref_title_auto_accept_all_upto">Automatiškai priimti visus failus</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">bendrinti failus su TRIfA per bendrinimo ketinimą.</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">dalytis failais</string>
+    <string name="layout___own_pushurl">Push URL:</string>
+    <string name="layout___remove_own_pushurl">pašalinti Push URL</string>
+    <string name="layout___friends_pushurl">Draugo Push URL:</string>
+    <string name="layout___remove_friends_pushurl">pašalinti draugo Push URL</string>
+    <string name="pref_description_use_push_service">ĮSPĖJIMAS: siekiant taupyti bateriją ir pralaidumą, bus naudojamas Google FCM arba Unified Push.
+\nPrograma tiesiogiai (ne per Tox) užmegs HTTPS: ryšius su kai kuriais PUSH serveriais.
+\nAktyvuokite tai tik tuo atveju, jei su tuo sutinkate.
+\nŠiai funkcijai reikalinga įdiegta Tox Push Message programa.</string>
+    <string name="pref_title_use_push_service">Naudoti Push paslaugą</string>
+    <string name="pref_title_download_push_msg_app">Atsisiųsti Push žinučių programėlę</string>
+    <string name="layout___conf_title">Pavadinimas:</string>
+    <string name="layout___conf_id">Konferencijos ID:</string>
+    <string name="title_activity_conferenceinfo">Konferencijos informacija</string>
 </resources>

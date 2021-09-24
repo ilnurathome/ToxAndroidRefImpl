@@ -52,10 +52,11 @@ import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
-import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_pubkey;
+import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.invite_to_all_conferences_own_relay;
+import static com.zoffcc.applications.trifa.HelperRelay.invite_to_conference_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.send_all_friend_pubkeys_to_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.send_relay_pubkey_to_all_friends;
 import static com.zoffcc.applications.trifa.HelperRelay.set_friend_as_own_relay_in_db;
@@ -161,9 +162,11 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
 
+        friend_line_container.setBackground(null);
         if (fl.last_online_timestamp == LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE)
         {
-            friend_line_container.setBackgroundResource(R.drawable.friend_list_neveronline_round_bg);
+            // friend_line_container.setBackgroundResource(R.drawable.friend_list_neveronline_round_bg);
+            friend_line_container.setBackgroundColor(context.getResources().getColor(R.color.md_amber_300));
         }
         else
         {
@@ -173,7 +176,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             }
             else
             {
-                friend_line_container.setBackgroundResource(R.drawable.friend_list_round_bg);
+                // friend_line_container.setBackgroundResource(R.drawable.friend_list_round_bg);
+                friend_line_container.setBackgroundColor(Color.TRANSPARENT);
             }
         }
 
@@ -237,6 +241,13 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         }
 
         statusText.setText(fl.status_message);
+
+        /*
+        statusText.setText("ft:s:" + tox_friend_by_public_key__wrapper(fl.tox_public_key_string) + " " +
+                           tox_file_sending_active(tox_friend_by_public_key__wrapper(fl.tox_public_key_string)) + "/" +
+                           tox_file_receiving_active(tox_friend_by_public_key__wrapper(fl.tox_public_key_string)) +
+                           " " + fl.status_message);
+         */
 
         avatar.setImageDrawable(d_lock);
 
@@ -391,13 +402,10 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
         String relay_ = get_relay_for_friend(fl.tox_public_key_string);
 
-        // Log.d(TAG, "001:relay=" + relay_);
-        if (relay_ != null)
+        if (relay_ != null) // friend HAS a relay
         {
-            long fnum_ = tox_friend_by_public_key__wrapper(relay_);
-
             FriendList relay_fl = main_get_friend(tox_friend_by_public_key__wrapper(relay_));
-            // Log.d(TAG, "002 relay_fl=" + relay_fl + " fnum=" + fnum_);
+
             if (relay_fl != null)
             {
                 if (fl.TOX_CONNECTION_real == 0)
@@ -408,9 +416,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 {
                     f_status_icon.setImageResource(R.drawable.circle_green);
                 }
-                // Log.d(TAG, "003 relay_fl=" + relay_fl);
 
-                if (fl.TOX_CONNECTION == 0)
+                if (relay_fl.TOX_CONNECTION_real == 0)
                 {
                     f_relay_icon.setImageResource(R.drawable.circle_red);
                 }
@@ -427,6 +434,15 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         {
             // Log.d(TAG, "004");
 
+            String get_pushurl_for_friend = get_pushurl_for_friend(fl.tox_public_key_string);
+
+            if ((get_pushurl_for_friend != null) && (get_pushurl_for_friend.length() > "https:".length()))
+            {
+                // friend has push support
+                f_relay_icon.setImageResource(R.drawable.circle_orange);
+                f_relay_icon.setVisibility(View.VISIBLE);
+            }
+
             if (fl.TOX_CONNECTION == 0)
             {
                 f_status_icon.setImageResource(R.drawable.circle_red);
@@ -435,9 +451,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             {
                 f_status_icon.setImageResource(R.drawable.circle_green);
             }
-
         }
-
 
         if (fl.TOX_USER_STATUS == 0)
         {
@@ -591,25 +605,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             }
             else
             {
-                try
-                {
-                    if (progressDialog == null)
-                    {
-                        progressDialog = new ProgressDialog(this.context);
-                        progressDialog.setIndeterminate(true);
-                        progressDialog.setMessage("");
-                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                    }
-                    progressDialog.show();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                Intent intent = new Intent(v.getContext(), MessageListActivity.class);
-                intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(this.friendlist.tox_public_key_string));
-                v.getContext().startActivity(intent);
+                show_messagelist_acticvity_for_friend(v.getContext(), this.friendlist.tox_public_key_string);
             }
         }
         catch (Exception e)
@@ -853,7 +849,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 if (id == R.id.item_info) {// show friend info page -----------------
                     long friend_num_temp_safety = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
 
-                    Log.i(TAG, "onMenuItemClick:info:1:fn_safety=" + friend_num_temp_safety);
+                        Log.i(TAG, "onMenuItemClick:info:1:fn_safety=" + friend_num_temp_safety);
 
                     Intent intent = new Intent(v.getContext(), FriendInfoActivity.class);
                     intent.putExtra("friendnum", friend_num_temp_safety);
@@ -871,36 +867,41 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                             if (res_conf_invite < 1) {
                                 Log.d(TAG, "onMenuItemClick:info:tox_conference_invite:ERR:" + res_conf_invite);
                             } else {
-                                // invite also my ToxProxy -------------
-                                if (have_own_relay()) {
-                                    tox_conference_invite(tox_friend_by_public_key__wrapper(get_own_relay_pubkey()),
-                                            res_conf_new);
+                                    // invite also my ToxProxy -------------
+                                    if (have_own_relay())
+                                    {
+                                        invite_to_conference_own_relay(res_conf_new);
+                                    }
+                                    // invite also my ToxProxy -------------
+                                    add_conference_wrapper(friend_num_temp_safety2, res_conf_new, "",
+                                                           TOX_CONFERENCE_TYPE_TEXT.value, false);
+                                    HelperGeneric.update_savedata_file_wrapper();
                                 }
-                                // invite also my ToxProxy -------------
-                                add_conference_wrapper(friend_num_temp_safety2, res_conf_new, "",
-                                        TOX_CONFERENCE_TYPE_TEXT.value, false);
-                                update_savedata_file_wrapper();
-                            }
                         }
                     }
                 } else if (id == R.id.item_create_av_conference) {
                     long res_conf_av_new = toxav_add_av_groupchat();
-                    if (res_conf_av_new >= 0) {
-                        update_savedata_file_wrapper();
-                        // conference was created, now invite the selected friend
-                        long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
-                        if (friend_num_temp_safety2 > 0) {
-                            int res_conf_invite = tox_conference_invite(friend_num_temp_safety2, res_conf_av_new);
-                            if (res_conf_invite < 1) {
-                                Log.d(TAG, "onMenuItemClick:info:AV:tox_conference_invite:ERR:" + res_conf_invite);
-                            } else {
-                                update_savedata_file_wrapper();
-                                add_conference_wrapper(friend_num_temp_safety2, res_conf_av_new, "",
-                                        TOX_CONFERENCE_TYPE_AV.value, false);
-                                update_savedata_file_wrapper();
+                        if (res_conf_av_new >= 0)
+                        {
+                            update_savedata_file_wrapper();
+                            // conference was created, now invite the selected friend
+                            long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
+                            if (friend_num_temp_safety2 > 0)
+                            {
+                                int res_conf_invite = tox_conference_invite(friend_num_temp_safety2, res_conf_av_new);
+                                if (res_conf_invite < 1)
+                                {
+                                    Log.d(TAG, "onMenuItemClick:info:AV:tox_conference_invite:ERR:" + res_conf_invite);
+                                }
+                                else
+                                {
+                                    update_savedata_file_wrapper();
+                                    add_conference_wrapper(friend_num_temp_safety2, res_conf_av_new, "",
+                                                           TOX_CONFERENCE_TYPE_AV.value, false);
+                                    HelperGeneric.update_savedata_file_wrapper();
+                                }
                             }
                         }
-                    }
                 } else if (id == R.id.item_add_toxproxy) {
                     if (!have_own_relay()) {
                         show_confirm_addrelay_dialog(v, f2);
@@ -930,5 +931,28 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         menu.show();
 
         return true;
+    }
+
+    static void show_messagelist_acticvity_for_friend(Context c, String friend_pubkey)
+    {
+        try
+        {
+            if (progressDialog == null)
+            {
+                progressDialog = new ProgressDialog(c);
+                progressDialog.setIndeterminate(true);
+                progressDialog.setMessage("");
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            }
+            progressDialog.show();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        Intent intent = new Intent(c, MessageListActivity.class);
+        intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(friend_pubkey));
+        c.startActivity(intent);
     }
 }

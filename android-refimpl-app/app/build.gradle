@@ -20,6 +20,7 @@
 buildscript {
     repositories {
         google()
+        mavenCentral()
         maven {
             url "https://jitpack.io"
         }
@@ -183,8 +184,8 @@ android {
 //        applicationId "com.zoffcc.applications.trifa"
         minSdkVersion 19
         targetSdkVersion 30
-        versionCode 10093
-        versionName "1.0.93"
+        versionCode 10116
+        versionName "1.0.116"
 
         renderscriptTargetApi 30
         renderscriptSupportModeEnabled true
@@ -234,6 +235,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(path: ':native-audio-jni', configuration: 'default')
     // implementation project(path: ':loggingstdout', configuration: 'default')
+    annotationProcessor project(':orma_processor')
     //
     //
     implementation "android.arch.lifecycle:extensions:1.1.1"
@@ -266,23 +268,36 @@ dependencies {
     implementation ('net.zetetic:android-database-sqlcipher:4.4.2@aar') {
         transitive = true
     }
-    implementation ('info.guardianproject.iocipher:IOCipher:0.4.2.1') {
+    implementation ('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.1') {
         transitive = true
     }
     //
     implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
-    implementation('com.github.maskarade.android.orma:orma:6.0.2') {
+
+    implementation('com.github.zoff99:pkgs_maskaradeOrma-annotations:6.0.2') {
+    }
+    implementation('com.github.zoff99:pkgs_maskaradeOrma-core:6.0.2') {
         transitive = true
         exclude group: 'io.reactivex'
         exclude group: 'com.android.support'
     }
-    implementation('com.github.maskarade.android.orma:orma-encryption:6.0.2') {
+    implementation('com.github.zoff99:pkgs_maskaradeOrma-migration:6.0.2') {
+        transitive = true
+        exclude group: 'io.reactivex'
+        exclude group: 'com.android.support'
+    }
+    implementation('com.github.zoff99:pkgs_maskaradeOrma:6.0.2') {
+        transitive = true
+        exclude group: 'io.reactivex'
+        exclude group: 'com.android.support'
+    }
+    implementation('com.github.zoff99:pkgs_maskaradeOrma-encryption:6.0.2') {
         transitive = true
         exclude group: 'io.reactivex'
         exclude group: 'com.android.support'
     }
     //
-    implementation('com.github.hotchemi:permissionsdispatcher:3.2.0') {
+    implementation('com.github.zoff99:pkgs_hotchemiPermissionsdispatcher:3.2.0') {
         exclude group: 'com.android.support'
     }
     //
@@ -290,72 +305,72 @@ dependencies {
         exclude group: 'com.android.support'
     }
     //
-    implementation('com.l4digital.fastscroll:fastscroll:1.1.2') {
+    implementation('com.github.zoff99:pkgs_l4digitalFastscroll:1.1.2') {
         exclude group: 'com.android.support'
     }
     //
-    implementation('com.vanniktech:emoji-ios:0.5.1') {
+    implementation('com.vanniktech:emoji-google:0.7.0') {
         exclude group: 'com.android.support'
     }
     //
     implementation('com.github.bumptech.glide:glide:4.11.0') {
         exclude group: 'com.android.support'
     }
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
     annotationProcessor 'androidx.annotation:annotation:1.1.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
     //
     //
     //
-    implementation 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.60@aar'
+    // implementation 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.61@aar'
+    implementation 'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.69'
     //
     //
     //
     //noinspection GradleCompatible
     implementation 'androidx.collection:collection:1.1.0'
-    implementation 'androidx.core:core:1.3.2'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.fragment:fragment:1.2.5'
+    implementation 'androidx.core:core:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'androidx.fragment:fragment:1.3.6'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.2.1'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.preference:preference:1.1.1'
     androidTestImplementation 'androidx.multidex:multidex:2.0.1'
     androidTestImplementation 'androidx.multidex:multidex-instrumentation:2.0.0'
-    implementation 'info.guardianproject.netcipher:netcipher:2.0.0-beta1'
-    implementation 'info.guardianproject.netcipher:netcipher-okhttp3:2.0.0-alpha1'
+    implementation 'com.github.zoff99:pkgs_guardianprojectNetcipher:2.0.0-beta1'
+    implementation 'com.github.zoff99:pkgs_guardianprojectNetcipher-okhttp:2.0.0-alpha1'
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.github.medyo:android-about-page:1.2.4'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'me.zhanghai.android.patternlock:library:2.1.2'
-    implementation 'com.github.armcha:AutoLinkTextView:0.3.0'
+    implementation 'com.github.zoff99:pkgs_armchaAutoLinkTextView:0.3.0'
     implementation 'com.github.chrisbanes:PhotoView:2.1.3'
     implementation 'com.squareup.okhttp3:okhttp:3.12.0'
     implementation 'com.daimajia.numberprogressbar:library:1.4@aar'
     implementation 'com.github.lawloretienne:discreteslider:0.0.9'
     implementation "com.github.YarikSOffice:lingver:1.3.0"
-    annotationProcessor 'com.github.maskarade.android.orma:orma-processor:6.0.2'
-    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.2.0'
+    annotationProcessor 'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher-processor:3.2.0'
     // ---------------------
     // ---------------------
     // Testing-only dependencies
-    androidTestImplementation 'androidx.test:core:1.3.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test:runner:1.3.0'
-    androidTestImplementation 'androidx.test:rules:1.3.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test:core:1.4.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.test:rules:1.4.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     // ---------------------
-    testImplementation 'androidx.test:core:1.3.0'
-    testImplementation 'androidx.test.ext:junit:1.1.2'
+    testImplementation 'androidx.test:core:1.4.0'
+    testImplementation 'androidx.test.ext:junit:1.1.3'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.robolectric:robolectric:4.4-alpha-2'
-    testImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-    testImplementation 'androidx.test.espresso:espresso-intents:3.3.0'
-    testImplementation 'androidx.test.ext:truth:1.3.0'
+    testImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    testImplementation 'androidx.test.espresso:espresso-intents:3.4.0'
+    testImplementation 'androidx.test.ext:truth:1.4.0'
 }
 
 //apply from: 'gradle_witness_ng.gradle'

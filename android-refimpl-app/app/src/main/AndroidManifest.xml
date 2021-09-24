@@ -57,6 +57,7 @@
     <!--<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>-->
     <uses-permission android:name="android.permission.RAISED_THREAD_PRIORITY" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
         android:name=".MainApplication"
@@ -65,7 +66,7 @@
         android:roundIcon="@mipmap/ic_launcher4_round"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:requestLegacyExternalStorage="true"
+        android:requestLegacyExternalStorage="false"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup,android:label">
 
@@ -123,6 +124,12 @@
             tools:ignore="LockedOrientationActivity,UnusedAttribute">
         </activity>
         <activity
+            android:name=".CallingWaitingActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask">
+        </activity>
+        <activity
             android:name=".ProfileActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/title_activity_profile">
@@ -136,6 +143,11 @@
             android:name=".FriendInfoActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/title_activity_friendinfo">
+        </activity>
+        <activity
+            android:name=".ConferenceInfoActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/title_activity_conferenceinfo">
         </activity>
         <activity
             android:name=".ConferencePeerInfoActivity"
@@ -196,7 +208,6 @@
             android:excludeFromRecents="true"
             android:label="@string/title_activity_share"
             android:launchMode="singleTask"
-            android:noHistory="true"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
@@ -205,6 +216,14 @@
                 <data android:mimeType="audio/*"/>
                 <data android:mimeType="image/*"/>
                 <data android:mimeType="text/plain"/>
+                <data android:mimeType="video/*"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:mimeType="audio/*"/>
+                <data android:mimeType="image/*"/>
                 <data android:mimeType="video/*"/>
             </intent-filter>
             <!-- Intent filter for handling tox: links -->
@@ -292,14 +311,12 @@
         </receiver>
 
         <provider
-            android:name=".GenericFileProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+            android:name=".IOCipherContentProvider"
+            android:authorities="com.zoffcc.applications.trifa"
+            android:grantUriPermissions="true"
+            android:exported="false">
         </provider>
+
     </application>
 
 </manifest>

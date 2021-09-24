@@ -51,6 +51,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MyMainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGES_TIMEDELTA_NO_TIMESTAMP_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
@@ -211,7 +212,6 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
             }
         });
 
-
         final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(
                 context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         img_avatar.setImageDrawable(d_lock);
@@ -253,6 +253,63 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
         {
             e.printStackTrace();
         }
+
+        // --------- timestamp (show only if different from previous message) ---------
+        // --------- timestamp (show only if different from previous message) ---------
+        // --------- timestamp (show only if different from previous message) ---------
+        date_time.setVisibility(View.GONE);
+        int my_position = this.getAdapterPosition();
+        if (my_position != RecyclerView.NO_POSITION)
+        {
+            try
+            {
+                if (MyMainActivity.conference_message_list_fragment.adapter != null)
+                {
+                    if (my_position < 1)
+                    {
+                        date_time.setVisibility(View.VISIBLE);
+                    }
+                    else
+                    {
+                        final ConferenceMessagelistAdapter.DateTime_in_out peer_cur = MyMainActivity.conference_message_list_fragment.adapter.getDateTime(
+                                my_position);
+                        final ConferenceMessagelistAdapter.DateTime_in_out peer_prev = MyMainActivity.conference_message_list_fragment.adapter.getDateTime(
+                                my_position - 1);
+                        if ((peer_cur == null) || (peer_prev == null))
+                        {
+                            date_time.setVisibility(View.VISIBLE);
+                        }
+                        // else if (peer_cur.direction != peer_prev.direction)
+                        // {
+                        //     date_time.setVisibility(View.VISIBLE);
+                        // }
+                        // else if (!peer_cur.pk.equals(peer_prev.pk))
+                        // {
+                        //     date_time.setVisibility(View.VISIBLE);
+                        // }
+                        else
+                        {
+                            // if message is within 20 seconds of previous message and same direction and same peer
+                            // then do not show timestamp
+                            if (peer_cur.timestamp > peer_prev.timestamp + (MESSAGES_TIMEDELTA_NO_TIMESTAMP_MS))
+                            {
+                                date_time.setVisibility(View.VISIBLE);
+                            }
+                        }
+
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
+        else
+        {
+        }
+        // --------- timestamp (show only if different from previous message) ---------
+        // --------- timestamp (show only if different from previous message) ---------
+        // --------- timestamp (show only if different from previous message) ---------
     }
 
     @Override

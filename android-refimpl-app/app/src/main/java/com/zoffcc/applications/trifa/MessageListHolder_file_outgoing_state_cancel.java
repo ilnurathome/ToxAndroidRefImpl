@@ -394,7 +394,7 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
                                     if (Build.VERSION.SDK_INT > 23)
                                     {
                                         file_uri = FileProvider.getUriForFile(context,
-                                                                              BuildConfig.APPLICATION_ID + ".provider",
+                                                                              BuildConfig.LIBRARY_PACKAGE_NAME + ".provider",
                                                                               new java.io.File(
                                                                                       message.filename_fullpath));
                                         newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);

@@ -176,7 +176,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             }
             else
             {
-                // friend_line_container.setBackgroundResource(R.drawable.friend_list_round_bg);
+                friend_line_container.setBackgroundResource(R.drawable.friend_list_round_bg);
                 friend_line_container.setBackgroundColor(Color.TRANSPARENT);
             }
         }

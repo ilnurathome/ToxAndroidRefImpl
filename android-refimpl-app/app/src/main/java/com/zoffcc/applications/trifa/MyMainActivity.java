@@ -364,9 +364,9 @@ public class MyMainActivity extends AppCompatActivity
 
     static TextView mt = null;
     static ImageView top_imageview = null;
-    static boolean native_lib_loaded = false;
-    static boolean native_audio_lib_loaded = false;
-    static String app_files_directory = "";
+//    static boolean native_lib_loaded = false;
+//    static boolean native_audio_lib_loaded = false;
+//    static String app_files_directory = "";
     // static boolean stop_me = false;
     // static Thread ToxServiceThread = null;
     static Semaphore semaphore_videoout_bitmap = new Semaphore(1);
@@ -375,7 +375,7 @@ public class MyMainActivity extends AppCompatActivity
     static Handler main_handler_s = null;
     static Context context_s = null;
     static MyMainActivity main_activity_s = null;
-    static AudioManager audio_manager_s = null;
+//    static AudioManager audio_manager_s = null;
     static Resources resources = null;
     static DisplayMetrics metrics = null;
     static int AudioMode_old;
